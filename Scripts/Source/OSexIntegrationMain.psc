@@ -3143,7 +3143,7 @@ Function SetDefaultSettings()
 	HideBarsInNPCScenes = True
 	EnableActorSpeedControl = True
 	AllowUnlimitedSpanking = False
-	AutoUndressIfNeeded = false
+	AutoUndressIfNeeded = true
 	ResetPosAfterSceneEnd = true 
 
 	PlayerAlwaysSubStraight = false
@@ -3162,9 +3162,9 @@ Function SetDefaultSettings()
 	DomLightPos = 0
 
 	CustomTimescale = 0
-	AlwaysUndressAtAnimStart = true
-	FullyAnimateRedress = true
-	TossClothesOntoGround = true
+	AlwaysUndressAtAnimStart = false
+	FullyAnimateRedress = false
+	TossClothesOntoGround = false
 	UseStrongerUnequipMethod = false
 
 	LowLightLevelLightsOnly = False
@@ -3173,8 +3173,8 @@ Function SetDefaultSettings()
 
 	SoundFormNumberWhitelist = new int[1]
 	SoundFormNumberWhitelist[0] = 9999 ;initializing to avoid array-related bugs
-
-	EnableImprovedCamSupport = (SKSE.GetPluginVersion("ImprovedCamera") != -1)
+UseFreeCam
+	EnableImprovedCamSupport = False
 
 	SpeedUpNonSexAnimation = False ;game pauses if anim finished early
 	SpeedUpSpeed = 1.5
@@ -3217,7 +3217,7 @@ Function SetDefaultSettings()
 
 
 
-	UseFreeCam = !(SKSE.GetPluginVersion("ImprovedCamera") != -1)
+	UseFreeCam = True
 
 	Forcefirstpersonafter = !UseFreeCam
 
