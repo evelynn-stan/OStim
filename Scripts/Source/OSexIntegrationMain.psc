@@ -3675,10 +3675,10 @@ Function Startup()
 	OControl.ResetControls()
 	OControl.UpdateControls() ; uneeded?
 
-	If (SKSE.GetPluginVersion("ImprovedCamera") == -1)
-		Debug.Notification("OStim: Improved Camera is not installed. First person scenes unavailable.")
-		Debug.Notification("OStim: However, freecam will have extra features.")
-	EndIf
+	;If (SKSE.GetPluginVersion("ImprovedCamera") == -1)
+		;Debug.Notification("OStim: Improved Camera is not installed. First person scenes unavailable.")
+		;Debug.Notification("OStim: However, freecam will have extra features.")
+	;EndIf
 
 	If (!_oGlobal.OStimGlobalLoaded())
 		Debug.MessageBox("It appears you have the OSex facial expression fix installed. Please exit and remove that mod, as it is now included in OStim, and having it installed will break some things now!")
