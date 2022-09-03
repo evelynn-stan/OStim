@@ -500,11 +500,10 @@ Event OnPageReset(String Page)
 		AddTextOption("OSA + OSex", "$ostim_by{CE0}")
 
 		SetCursorPosition(1)
-		AddTextOption("OSex Overhaul & API", "")
+		AddTextOption("OSA Overhaul & API", "")
 
 		AddTextOption("", "")
 		AddColoredHeader("$ostim_links")
-		AddTextOption("patreon.com/ostim", "")
 		AddTextOption("discord.gg/RECvhVaRcU", "")
 
 		Main.PlayDing()
