@@ -434,6 +434,16 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		endif 
 	endif 
 
+	; Disable Precision mod collisions for the actors involved to prevent misalignments and teleports to (0,0) cell
+	TogglePrecisionForActor(DomActor, false)
+
+	If SubActor
+		TogglePrecisionForActor(SubActor, false)
+	EndIf
+
+	If ThirdActor
+		TogglePrecisionForActor(ThirdActor, false)
+	EndIf
 
 	If (Aggressive)
 		If (AggressingActor)
@@ -926,6 +936,17 @@ Event OnUpdate() ;OStim main logic loop
 
 	oldscenemetadata = scenemetadata
 	scenemetadata = PapyrusUtil.StringArray(0)
+
+	; Enable Precision mod collisions for the actors involved again
+	TogglePrecisionForActor(DomActor, true)
+
+	If (SubActor)
+		TogglePrecisionForActor(SubActor, true)
+	EndIf
+
+	If (ThirdActor)
+		TogglePrecisionForActor(ThirdActor, true)
+	EndIf
 
 	SceneRunning = False
 
@@ -2108,6 +2129,8 @@ Function OnAnimationChange()
 
 			If (Act != DomActor) && (Act != SubActor) && (IsActorActive(Act))
 				ThirdActor = Act
+				; Disable Precision mod collisions for the third actor to prevent misalignments and teleports to (0,0) cell
+				TogglePrecisionForActor(ThirdActor, false)
 				i = max
 			Endif
 			i += 1
@@ -2142,6 +2165,9 @@ Function OnAnimationChange()
 		if !DisableScaling
 			ThirdActor.SetScale(1.0)
 		EndIf
+
+		; Enable Precision mod collisions again for the actor that is leaving
+		TogglePrecisionForActor(ThirdActor, true)
 
 		ThirdActor = none
 
@@ -3297,6 +3323,25 @@ EndFunction
 
 Bool Function GetGameIsVR()
 	Return (PapyrusUtil.GetScriptVersion() == 36) ;obviously this no guarantee but it's the best we've got for now
+EndFunction
+
+Function TogglePrecisionForActor(Actor Act, bool Enable)
+	; Wrapper function to toggle Precision On or Off for the given Actor if Precision is installed
+	; if Enable is True, Precision will be enabled for the given Actor
+	; if Enable is False, Precision will be disabled for the given Actor
+	; if Actor has Precision enabled and Enable is True, this function won't call Precision Utility
+	; the same happens if Actor has Precision disabled and Enable is False
+	If (IsModLoaded("Precision.esp"))
+		If (Precision_Utility.IsActorActive(Act) != Enable)
+			Precision_Utility.ToggleDisableActor(Act, !Enable)
+			
+			If (Enable)
+				Console("Precision was re-enabled for actor " + Act.GetActorBase().GetName())
+			Else
+				Console("Precision was disabled for actor " + Act.GetActorBase().GetName())
+			EndIf
+		EndIf
+	EndIf
 EndFunction
 
 Function AcceptReroutingActors(Actor Act1, Actor Act2) ;compatibility thing, never call this one directly
