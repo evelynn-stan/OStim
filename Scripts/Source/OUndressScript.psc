@@ -325,7 +325,7 @@ Event OstimChange(String eventName, String strArg, Float numArg, Form sender)
 
 		String CClass = OStim.GetCurrentAnimationClass()
 		If (!DomNaked)
-			If (CClass == "Sx") || (CClass == "Po") || (CClass == "HhPo") || (CClass == "ApPJ") || (CClass == "HhPJ") || (CClass == "HJ") || (CClass == "ApHJ") || (CClass == "DHJ") || (CClass == "SJ")|| (CClass == "An")|| (CClass == "BoJ")|| (CClass == "FJ")
+			If (CClass == "Sx") || (CClass == "Po") || (CClass == "HhPo") || (CClass == "ApPJ") || (CClass == "HhPJ") || (CClass == "HJ") || (CClass == "ApHJ") || (CClass == "DHJ") || (CClass == "SJ")|| (CClass == "An")|| (CClass == "BoJ")|| (CClass == "FJ")|| (CClass == "BJ")
 				If OStim.IsInFreeCam() && (actors[0] == playerref)
 					DidToggle = True
 					OStim.ToggleFreeCam()
@@ -335,7 +335,7 @@ Event OstimChange(String eventName, String strArg, Float numArg, Form sender)
 			EndIf
 		EndIf
 		If (!SubNaked)
-			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Cr") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF")
+			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Cr") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF") || (StringUtil.Find(OStim.GetCurrentAnimationSceneID(), "MutualMast") != -1)
 				If OStim.IsInFreeCam() && (actors[1] == playerref)
 					DidToggle = True
 					OStim.ToggleFreeCam()
