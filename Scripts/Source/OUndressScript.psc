@@ -30,18 +30,7 @@ Event OnInit()
 EndEvent
 
 
-Function Strip(Actor Target) ; if you do a strip mid scene, you MUST disable free cam or else! 
-	bool bRestoreFreecam = false
-	if (target == PlayerRef)
-		if OSANative.IsFreeCam()
-			bRestoreFreecam = true
-			ostim.ToggleFreeCam(false)
-			Console("Locking freecam")
-		endif 
-
-		outils.lock("mtx_tfc") ; lock free cam, nobody can change it until we say so
-	endif 
-
+Function Strip(Actor Target)
 	If (OStim.TossClothesOntoGround)
 		StripAndToss(Target)
 	Else
@@ -60,12 +49,7 @@ Function Strip(Actor Target) ; if you do a strip mid scene, you MUST disable fre
 	endif 
 
 	if (Target == PlayerRef)
-		OSANative.Unlock("mtx_tfc"); now you may change it again.
-
-		if bRestoreFreecam
-			console("unlocking freecam")
-			ostim.ToggleFreeCam(true)
-		endif 
+		PlayerRef.QueueNiNodeUpdate()
 	endif 
 EndFunction
 
@@ -309,8 +293,6 @@ Event OStimPreStart(String EventName, String StrArg, Float NumArg, Form Sender)
 EndEvent
 
 Event OstimChange(String eventName, String strArg, Float numArg, Form sender)
-	Bool DidToggle = False
-
 	If (OStim.AutoUndressIfNeeded && OStim.AnimationRunning())
 		Bool DomNaked = OStim.IsNaked(actors[0])
 		Bool SubNaked = True
@@ -326,38 +308,22 @@ Event OstimChange(String eventName, String strArg, Float numArg, Form sender)
 		String CClass = OStim.GetCurrentAnimationClass()
 		If (!DomNaked)
 			If (CClass == "Sx") || (CClass == "Po") || (CClass == "HhPo") || (CClass == "ApPJ") || (CClass == "HhPJ") || (CClass == "HJ") || (CClass == "ApHJ") || (CClass == "DHJ") || (CClass == "SJ")|| (CClass == "An")|| (CClass == "BoJ")|| (CClass == "FJ")|| (CClass == "BJ")
-				If OStim.IsInFreeCam() && (actors[0] == playerref)
-					DidToggle = True
-					OStim.ToggleFreeCam()
-				EndIf
 				Strip(actors[0])
 				SendModEvent("ostim_midsceneundress_dom")
 			EndIf
 		EndIf
 		If (!SubNaked)
 			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Cr") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF") || (StringUtil.Find(OStim.GetCurrentAnimationSceneID(), "MutualMast") != -1)
-				If OStim.IsInFreeCam() && (actors[1] == playerref)
-					DidToggle = True
-					OStim.ToggleFreeCam()
-				EndIf
 				Strip(actors[1])
 				SendModEvent("ostim_midsceneundress_sub")
 			EndIf
 		EndIf
 		If (!ThirdNaked)
 			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Cr") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF")
-				If OStim.IsInFreeCam() && (actors[2] == playerref)
-					DidToggle = True
-					OStim.ToggleFreeCam()
-				EndIf
 				Strip(actors[2])
 				SendModEvent("ostim_midsceneundress_third")
 			EndIf
 		EndIf
-	EndIf
-
-	If (DidToggle)
-		OStim.ToggleFreeCam()
 	EndIf
 EndEvent
 
@@ -365,18 +331,7 @@ Event OstimThirdJoin(String EventName, String StrArg, Float NumArg, Form Sender)
 	SyncActors()
 	If (OStim.AlwaysUndressAtAnimStart)
 		Console("Stripping third actor")
-
-		Bool DidToggle = False
-		If (OStim.IsInFreeCam())
-			DidToggle = True
-			OStim.ToggleFreeCam()
-		EndIf
-
 		Strip(actors[2])
-
-		If (DidToggle)
-			OStim.ToggleFreeCam()
-		EndIf
 	EndIf	
 EndEvent
 
