@@ -16,6 +16,15 @@ Bool _IsSetup = False
 Bool _IsKeySetup = False
 Int[] OKEY
 
+Int Property osaMainMenuKey = 156 auto ; numpad ENTER
+Int Property osaUpKey = 72 auto ; numpad 8
+Int Property osaDownKey = 76 auto ; numpad 5
+Int Property osaLeftKey = 75 auto ; numpad 4
+Int Property osaRightKey = 77 auto ; numpad 6
+Int Property osaTogKey = 73 auto ; numpad 9
+Int Property osaYesKey = 71 auto ; numpad 7
+Int Property osaEndKey = 83 auto ; numpad .
+
 Bool property disableControl auto
 
 Armor[] InspectArmor
@@ -446,16 +455,17 @@ Event OnChangeName(String EventName, String NewName, Float Arrrgh, Form Actra)
     (Actra as Actor).SetDisplayName(NewName)
 EndEvent
 
-Int[] Function SetOKey() Global
+Int[] Function SetOKey()
     Int[] OK = new Int[14]
-    OK[0]  = 83  ; EXIT
-    OK[1]  = 156 ; MENU
-    OK[2]  = 72  ; UP
-    OK[3]  = 76  ; DOWN
-    OK[4]  = 75  ; LEFT
-    OK[5]  = 77  ; RIGHT
-    OK[6]  = 73  ; TOG
-    OK[7]  = 71  ; YES
+    OK[0]  = osaEndKey
+    OK[1]  = osaMainMenuKey
+    OK[2]  = osaUpKey
+    OK[3]  = osaDownKey
+    OK[4]  = osaLeftKey
+    OK[5]  = osaRightKey
+    OK[6]  = osaTogKey
+    OK[7]  = osaYesKey
+    ; the below keys are unused in OStim, so they can't be rebinded in the MCM
     OK[8]  = 79  ; NO
     OK[9]  = 78  ; INSPECT
     OK[10] = 74  ; VANISH

@@ -3795,6 +3795,7 @@ Function OnLoadGame()
 		AI.OnGameLoad()
 		OBars.OnGameLoad()
 		OUndress.OnGameLoad()
+		OControl.OPlayerControls()
 
 		SendLoadGameEvent()
 
