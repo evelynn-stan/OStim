@@ -122,6 +122,28 @@ actor playerref
 
 int SetUndressingAbout
 
+; OSA key bindings settings
+int SetOsaMainMenuKey
+int SetOsaUpKey
+int SetOsaDownKey
+int SetOsaLeftKey
+int SetOsaRightKey
+int SetOsaTogKey
+int SetOsaYesKey
+int SetOsaEndKey
+int SetOsaResetDefaultKeys
+
+Int osaMainMenuKeyDefault = 156 ; numpad ENTER
+Int osaUpKeyDefault = 72 ; numpad 8
+Int osaDownKeyDefault = 76 ; numpad 5
+Int osaLeftKeyDefault = 75 ; numpad 4
+Int osaRightKeyDefault = 77 ; numpad 6
+Int osaTogKeyDefault = 73 ; numpad 9
+Int osaYesKeyDefault = 71 ; numpad 7
+Int osaEndKeyDefault = 83 ; numpad .
+
+_oControl OSAControl
+
 ;ORomance 
 int SetORDifficulty
 int SetORSexuality
@@ -216,6 +238,7 @@ EndEvent
 Function Init()
 	Parent.OnGameReload()
 	Main = (Self as Quest) as OsexIntegrationMain
+	OSAControl = Quest.GetQuest("0SAControl") as _oControl
 
 	DomLightModeList = new String[3]
 	DomLightModeList[0] = "$ostim_light_mode_none"
@@ -249,6 +272,18 @@ EndFunction
 Event OnConfigRegister()
 	ImportSettings()
 endEvent
+
+Event onConfigOpen()
+	; For some reason, SkyUI's OnGameReload() isn't firing properly when loading an existing game
+	; so we have to instantiate OSAControl when the menu is opened
+	; for key rebinding to work in existing saves with a previous version of OStim installed
+	OSAControl = Quest.GetQuest("0SAControl") as _oControl
+EndEvent
+
+Event OnConfigClose()
+	; set the OSA keys array in the _oControl script
+	OSAControl.oPlayerControls()
+EndEvent
 
 Event OnPageReset(String Page)
 	{Called when a new page is selected, including the initial empty page}
@@ -370,6 +405,18 @@ Event OnPageReset(String Page)
 		SetPullOut = AddKeyMapOption("$ostim_pullout_key", Main.PullOutKey)
 		SetControlToggle = AddKeyMapOption("$ostim_control_toggle_key", Main.ControlToggleKey)
 		SetFreecamToggleKey = AddKeyMapOption("$ostim_tfc_key", Main.FreecamKey)
+		AddEmptyOption()
+
+		AddColoredHeader("$ostim_header_osa_keys")
+		SetOsaMainMenuKey = AddKeyMapOption("$ostim_osaKeys_mainMenu", OSAControl.osaMainMenuKey)
+		SetOsaUpKey = AddKeyMapOption("$ostim_osaKeys_up", OSAControl.osaUpKey)
+		SetOsaDownKey = AddKeyMapOption("$ostim_osaKeys_down", OSAControl.osaDownKey)
+		SetOsaLeftKey = AddKeyMapOption("$ostim_osaKeys_left", OSAControl.osaLeftKey)
+		SetOsaRightKey = AddKeyMapOption("$ostim_osaKeys_right", OSAControl.osaRightKey)
+		SetOsaTogKey = AddKeyMapOption("$ostim_osaKeys_tog", OSAControl.osaTogKey)
+		SetOsaYesKey = AddKeyMapOption("$ostim_osaKeys_yes", OSAControl.osaYesKey)
+		SetOsaEndKey = AddKeyMapOption("$ostim_osaKeys_end", OSAControl.osaEndKey)
+		SetOsaResetDefaultKeys = AddToggleOption("$ostim_osaKeys_reset", false)
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_lights")
@@ -771,6 +818,9 @@ Event OnOptionSelect(Int Option)
 		If ShowMessage("$ostim_message_import_confirm")
 			ImportSettings(true)
 		EndIf
+	ElseIf (Option == SetOsaResetDefaultKeys)
+		resetOsaKeysToDefaults()
+		ShowMessage("$ostim_message_reset_osa_keys", false)
 	EndIf
 EndEvent
 
@@ -993,6 +1043,22 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_import")
 	ElseIf (Option == ImportDefaultSettings)
 		SetInfoText("$ostim_tooltip_import_default")
+	ElseIf (Option == SetOsaMainMenuKey)
+		SetInfoText("$ostim_tooltip_osa_main_menu")
+	ElseIf (Option == SetOsaUpKey)
+		SetInfoText("$ostim_tooltip_osa_up")
+	ElseIf (Option == SetOsaDownKey)
+		SetInfoText("$ostim_tooltip_osa_down")
+	ElseIf (Option == SetOsaLeftKey)
+		SetInfoText("$ostim_tooltip_osa_left")
+	ElseIf (Option == SetOsaRightKey)
+		SetInfoText("$ostim_tooltip_osa_right")
+	ElseIf (Option == SetOsaTogKey)
+		SetInfoText("$ostim_tooltip_osa_tog")
+	ElseIf (Option == SetOsaYesKey)
+		SetInfoText("$ostim_tooltip_osa_yes")
+	ElseIf (Option == SetOsaEndKey)
+		SetInfoText("$ostim_tooltip_osa_end")
 	EndIf
 EndEvent
 
@@ -1191,7 +1257,31 @@ Event OnOptionKeyMapChange(Int Option, Int KeyCode, String ConflictControl, Stri
 	ElseIf (Option == SetOCumKey)
 		StorageUtil.SetIntValue(none, SUOcumKey, keycode)
 		SetKeyMapOptionValue(Option, KeyCode)
-	EndIf
+	ElseIf (Option == SetOsaMainMenuKey)
+		OSAControl.osaMainMenuKey = keyCode
+		SetKeyMapOptionValue(SetOsaMainMenuKey, OSAControl.osaMainMenuKey)
+	ElseIf (Option == SetOsaUpKey)
+		OSAControl.osaUpKey = keyCode
+		SetKeyMapOptionValue(SetOsaUpKey, OSAControl.osaUpKey)
+	ElseIf (Option == SetOsaDownKey)
+		OSAControl.osaDownKey = keyCode
+		SetKeyMapOptionValue(SetOsaDownKey, OSAControl.osaDownKey)
+	ElseIf (Option == SetOsaLeftKey)
+		OSAControl.osaLeftKey = keyCode
+		SetKeyMapOptionValue(SetOsaLeftKey, OSAControl.osaLeftKey)
+	ElseIf (Option == SetOsaRightKey)
+		OSAControl.osaRightKey = keyCode
+		SetKeyMapOptionValue(SetOsaRightKey, OSAControl.osaRightKey)
+	ElseIf (Option == SetOsaTogKey)
+		OSAControl.osaTogKey = keyCode
+		SetKeyMapOptionValue(SetOsaTogKey, OSAControl.osaTogKey)
+	ElseIf (Option == SetOsaYesKey)
+		OSAControl.osaYesKey = keyCode
+		SetKeyMapOptionValue(SetOsaYesKey, OSAControl.osaYesKey)
+	ElseIf (Option == SetOsaEndKey)
+		OSAControl.osaEndKey = keyCode
+		SetKeyMapOptionValue(SetOsaEndKey, OSAControl.osaEndKey)
+	Endif
 EndEvent
 
 function DrawSlotPage()
@@ -1378,6 +1468,16 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetDefaultFOV", Main.DefaultFOV as Int)
 	JMap.SetInt(OstimSettingsFile, "SetCameraSpeed", Main.FreecamSpeed as Int)
 	JMap.SetInt(OstimSettingsFile, "SetForceFirstPerson", Main.ForceFirstPersonAfter as Int)
+
+	; OSA keys settings export.
+	JMap.SetInt(OstimSettingsFile, "SetOsaMainMenuKey", OSAControl.osaMainMenuKey as Int)
+	JMap.SetInt(OstimSettingsFile, "SetOsaUpKey", OSAControl.osaUpKey as Int)
+	JMap.SetInt(OstimSettingsFile, "SetOsaDownKey", OSAControl.osaDownKey as Int)
+	JMap.SetInt(OstimSettingsFile, "SetOsaLeftKey", OSAControl.osaLeftKey as Int)
+	JMap.SetInt(OstimSettingsFile, "SetOsaRightKey", OSAControl.osaRightKey as Int)
+	JMap.SetInt(OstimSettingsFile, "SetOsaTogKey", OSAControl.osaTogKey as Int)
+	JMap.SetInt(OstimSettingsFile, "SetOsaYesKey", OSAControl.osaYesKey as Int)
+	JMap.SetInt(OstimSettingsFile, "SetOsaEndKey", OSAControl.osaEndKey as Int)
 
 	; Misc settings export.
 	JMap.SetInt(OstimSettingsFile, "SetCustomTimescale", Main.CustomTimescale as Int)
@@ -1588,6 +1688,16 @@ Function ImportSettings(bool default = false)
 	Main.FreecamKey = JMap.GetInt(OstimSettingsFile, "SetFreecamToggleKey")
 	Main.RemapFreecamKey(main.FreecamKey)
 
+	; OSA keys settings import.
+	OSAControl.osaMainMenuKey =  JMap.GetInt(OstimSettingsFile, "SetOsaMainMenuKey")
+	OSAControl.osaUpKey = JMap.GetInt(OstimSettingsFile, "SetOsaUpKey")
+	OSAControl.osaDownKey = JMap.GetInt(OstimSettingsFile, "SetOsaDownKey")
+	OSAControl.osaLeftKey = JMap.GetInt(OstimSettingsFile, "SetOsaLeftKey")
+	OSAControl.osaRightKey = JMap.GetInt(OstimSettingsFile, "SetOsaRightKey")
+	OSAControl.osaTogKey = JMap.GetInt(OstimSettingsFile, "SetOsaTogKey")
+	OSAControl.osaYesKey = JMap.GetInt(OstimSettingsFile, "SetOsaYesKey")
+	OSAControl.osaEndKey = JMap.GetInt(OstimSettingsFile, "SetOsaEndKey")
+
 	; Bed settings export.
 	Main.UseBed = JMap.GetInt(OstimSettingsFile, "SetEnableBeds")
 	Main.BedSearchDistance = JMap.GetInt(OstimSettingsFile, "SetBedSearchDistance")
@@ -1696,4 +1806,30 @@ Function ImportSettings(bool default = false)
 	osexintegrationmain.Console("Loading Ostim settings.")
 	; Force page reset to show updated changes.
 	ForcePageReset()
+EndFunction
+
+Function resetOsaKeysToDefaults()
+	OSAControl.osaMainMenuKey = osaMainMenuKeyDefault
+	SetKeyMapOptionValue(SetOsaMainMenuKey, OSAControl.osaMainMenuKey)
+
+	OSAControl.osaUpKey = osaUpKeyDefault
+	SetKeyMapOptionValue(SetOsaUpKey, OSAControl.osaUpKey)
+
+	OSAControl.osaDownKey = osaDownKeyDefault
+	SetKeyMapOptionValue(SetOsaDownKey, OSAControl.osaDownKey)
+
+	OSAControl.osaLeftKey = osaLeftKeyDefault
+	SetKeyMapOptionValue(SetOsaLeftKey, OSAControl.osaLeftKey)
+
+	OSAControl.osaRightKey = osaRightKeyDefault
+	SetKeyMapOptionValue(SetOsaRightKey, OSAControl.osaRightKey)
+
+	OSAControl.osaTogKey = osaTogKeyDefault
+	SetKeyMapOptionValue(SetOsaTogKey, OSAControl.osaTogKey)
+
+	OSAControl.osaYesKey = osaYesKeyDefault
+	SetKeyMapOptionValue(SetOsaYesKey, OSAControl.osaYesKey)
+
+	OSAControl.osaEndKey = osaEndKeyDefault
+	SetKeyMapOptionValue(SetOsaEndKey, OSAControl.osaEndKey)
 EndFunction
