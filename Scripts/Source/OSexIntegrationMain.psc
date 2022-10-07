@@ -184,6 +184,9 @@ bool property ShowTutorials auto
 
 Actor DomActor
 Actor SubActor
+Actor ThirdActor
+
+Actor[] Actors
 
 String diasa
 
@@ -213,7 +216,6 @@ Bool Property UndressDom Auto
 Bool Property UndressSub Auto
 Bool Property AnimateUndress Auto
 String StartingAnimation
-Actor ThirdActor
 
 
 
@@ -240,6 +242,8 @@ Int[] OSexControlKeys
 Int CurrentOID ; the OID is the JMap ID of the current animation. You can feed this in to ODatabase
 Int LastHubOID
 Bool CurrentAnimIsAggressive
+int[] PenisAngles
+float[] ActorScales
 ;--
 
 Bool property AIRunning auto
@@ -443,6 +447,45 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 
 	If ThirdActor
 		TogglePrecisionForActor(ThirdActor, false)
+	EndIf
+
+	; set actor properties
+	If ThirdActor
+		Actors = new Actor[3]
+		Actors[0] = DomActor
+		Actors[1] = SubActor
+		Actors[2] = ThirdActor
+
+		PenisAngles = new int[3]
+		PenisAngles[0] = 0
+		PenisAngles[1] = 0
+		PenisAngles[2] = 0
+
+		ActorScales = new float[3]
+		ActorScales[0] = 1.03
+		ActorScales[1] = 1.0
+		ActorScales[2] = 1.0
+	ElseIf SubActor
+		Actors = new Actor[2]
+		Actors[0] = DomActor
+		Actors[1] = SubActor
+
+		PenisAngles = new int[2]
+		PenisAngles[0] = 0
+		PenisAngles[1] = 0
+
+		ActorScales = new float[2]
+		ActorScales[0] = 1.03
+		ActorScales[1] = 1.0
+	Else
+		Actors = new Actor[1]
+		Actors[0] = DomActor
+
+		PenisAngles = new int[1]
+		PenisAngles[0] = 0
+
+		ActorScales = new float[1]
+		ActorScales[0] = 1.03
 	EndIf
 
 	If (Aggressive)
@@ -2145,6 +2188,10 @@ Function OnAnimationChange()
 			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendPh", "OnPhThird")
 			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx", "OnExThird")
 
+			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
+			PenisAngles = PapyrusUtil.PushInt(PenisAngles, 0)
+			ActorScales = PapyrusUtil.PushFloat(ActorScales, 1.0)
+
 			if !DisableScaling
 				ScaleToStandardHeight(ThirdActor)
 			EndIf
@@ -2162,6 +2209,10 @@ Function OnAnimationChange()
 		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendPh")
 		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx")
 
+		Actors = PapyrusUtil.ResizeActorArray(Actors, 2)
+		PenisAngles = PapyrusUtil.ResizeIntArray(PenisAngles, 2)
+		ActorScales = PapyrusUtil.ResizeFloatArray(ActorScales, 2)
+
 		if !DisableScaling
 			ThirdActor.SetScale(1.0)
 		EndIf
@@ -2174,6 +2225,17 @@ Function OnAnimationChange()
 		SendModEvent("ostim_thirdactor_leave") ; careful, getthirdactor() won't work in this event
 	EndIf
 
+	int i = Actors.Length
+
+	While i
+		i -= 1
+		int oldPenisAngle = PenisAngles[i]
+		PenisAngles[i] = ODatabase.GetPenisAngle(CurrentOID, i)
+
+		If PenisAngles[i] != oldPenisAngle
+			Debug.SendAnimationEvent(Actors[i], "SOSBend" + PenisAngles[i])
+		EndIf
+	EndWhile
 
 	If StringArrayContainsValue(SubMouthOpenClasses, GetCurrentAnimationClass())
 		If MouthIsOpen(SubActor)
