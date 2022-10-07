@@ -313,7 +313,7 @@ Event OstimChange(String eventName, String strArg, Float numArg, Form sender)
 			EndIf
 		EndIf
 		If (!SubNaked)
-			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Cr") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF") || (StringUtil.Find(OStim.GetCurrentAnimationSceneID(), "MutualMast") != -1)
+			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF") || (StringUtil.Find(OStim.GetCurrentAnimationSceneID(), "MutualMast") != -1)
 				Strip(actors[1])
 				SendModEvent("ostim_midsceneundress_sub")
 			EndIf
