@@ -91,7 +91,7 @@ Event OnKeyDown(Int KeyPress)
     EndIf
 
     If (KeyPress == OKey[0])
-        UI.Invoke("HUD Menu", "_root.WidgetContainer." + Glyph + ".widget.ctr.END")
+        ostim.EndAnimation(true)        
     ElseIf disableControl
         If !Utility.IsInMenuMode()
             OsexIntegrationMain.Console("OSA controls disabled by OStim property")
