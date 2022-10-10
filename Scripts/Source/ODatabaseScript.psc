@@ -72,7 +72,7 @@ Function InitDatabase()
 		JDB.SetObj("OStim.ODatabase", Database)
 
 		If Build()
-			Console(GetLengthOArray(Database) + " OSex scenes installed")
+			Console(GetLengthOArray(Database) + " scenes installed")
 			Loaded = True
 
 			SaveToDisk()
@@ -240,6 +240,36 @@ EndFunction
 Bool Function HasPositionData(Int Animation, String Data) ; this supports partial data
 	String SlotData = GetPositionData(Animation)
 	Return !(StringUtil.Find(SlotData, Data) == -1)
+EndFunction
+
+int Function GetPenisAngle(int Animation, int Position)
+	Return JMap.GetInt(GetActorProperties(Animation, Position), "penisAngle", 0)
+EndFunction
+
+float Function GetScale(int Animation, int Position)
+	float Default = 1.0
+	If Position == 0
+		Default = 1.03
+	EndIf
+	
+	Return JMap.Getflt(GetActorProperties(Animation, Position), "scale", Default)
+EndFunction
+
+; to avoid conflict all tags are serialized in lowercase!
+bool Function HasTag(int Animation, string Tag)
+	Return JArray.findStr(JMap.getObj(Animation, "tags"), Tag) != -1
+EndFunction
+
+string[] Function GetTags(int Animation)
+	Return JArray.asStringArray(JMap.getObj(Animation, "tags"))
+EndFunction
+
+bool Function HasPositionTag(int Animation, int Position, string Tag)
+	Return JArray.findStr(JMap.getObj(getActorProperties(Animation, Position), "tags"), Tag) != -1
+EndFunction
+
+string[] Function GetPositionTags(int Animation, int Position)
+	Return JArray.asStringArray(JMap.getObj(getActorProperties(Animation, Position), "tags"))
 EndFunction
 
 ;----------------------------------------------
@@ -941,6 +971,11 @@ Bool Function getBoolOMap(Int OMap, String zKey)
 		Return True
 	EndIf
 	Return False
+EndFunction
+
+Int Function getActorProperties(Int Animation, Int Position)
+	int Actors = JMap.getObj(Animation, "actors")
+	Return JArray.getObj(Actors, Position)
 EndFunction
 
 ;----------------------------------
