@@ -196,7 +196,7 @@ Function PickUpThings(Actor Target, ObjectReference[] Items)
 		If (Item)
 			If (PlayerRef.GetItemCount(Item) < 1)
 				Target.AddItem(Item, 1, True)
-				Target.EquipItem(Item.GetBaseObject(), False, True)
+				Target.EquipItemEx(Item.GetBaseObject(), equipSound = False)
 			endif
 		EndIf
 		i += 1
@@ -225,7 +225,7 @@ Function EquipForms(Actor Target, Form[] Items)
 	While (i < Items.Length)
 		Form Item = Items[i]
 		If (Item)
-			Target.EquipItem(Item, False, True)
+			Target.EquipItemEx(Item, equipSound = False)
 		EndIf
 		i += 1
 	EndWhile
@@ -505,7 +505,7 @@ Event AnimatedRedressThread(String EventName, String StrArg, float NumArg, Form 
 				Utility.Wait(DressPoint)
 			EndIf
 			If (!Target.IsDead() && !OStim.IsActorActive(Target))
-				Target.EquipItem(items[i], false, true)
+				Target.EquipItemEx(items[i], equipSound = False)
 			EndIf
 			If (Loaded)
 				Utility.Wait(AnimLen - DressPoint)
