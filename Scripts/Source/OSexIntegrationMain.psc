@@ -335,9 +335,6 @@ Float[] MouthStimValues
 Float[] HandStimValues
 Float[] ClitStimValues
 
-String[] SubMouthOpenClasses
-String[] DomMouthOpenClasses
-
 Float[] AnusStimValues
 Float[] FeetStimValues
 Float[] BreastsStimValues
@@ -2079,28 +2076,6 @@ Event SyncActors(string eventName, string strArg, float numArg, Form sender)
 	endif
 endEvent
 
-Function OpenMouth(Actor Act)
-	Console("Opening mouth...")
-	String a = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(act))
-
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "1", numArg = 40)
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "0", numArg = 100)
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "5", numArg = 100)
-EndFunction
-
-Function CloseMouth(Actor Act)
-	Console("Closing mouth...")
-	String a = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(act)) 
-
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "1", numArg = 0)
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "0", numArg = 0)
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "5", numArg = 0)
-EndFunction
-
-Bool function MouthIsOpen(Actor Act)
-	Return (MfgConsoleFunc.GetPhoneme(Act, 0) > 75)
-EndFunction
-
 Function OnAnimationChange()
 	
 	Console("Changing animation...")
@@ -2236,30 +2211,6 @@ Function OnAnimationChange()
 			Debug.SendAnimationEvent(Actors[i], "SOSBend" + PenisAngles[i])
 		EndIf
 	EndWhile
-
-	If StringArrayContainsValue(SubMouthOpenClasses, GetCurrentAnimationClass())
-		If MouthIsOpen(SubActor)
-			;Console("Mouth already open")
-		Else
-			OpenMouth(SubActor)
-		Endif
-	Else
-		If MouthIsOpen(subactor)
-			CloseMouth(subactor)
-		Endif
-	Endif
-
-	If StringArrayContainsValue(DomMouthOpenClasses, GetCurrentAnimationClass())
-		If MouthIsOpen(DomActor)
-			;Console("Mouth already open")
-		Else
-			OpenMouth(DomActor)
-		Endif
-	Else
-		If MouthIsOpen(DomActor)
-			CloseMouth(DomActor)
-		EndIf
-	EndIf
 
 	if sceneChange
 		SendModEvent("ostim_scenechanged")
@@ -3204,21 +3155,6 @@ Function SetSystemVars()
 	ProstateStimValues[Feet] = 0.0
 	ProstateStimValues[Breasts] = 0.0
 	ProstateStimValues[Prostate] = 0.0
-
-
-	SubMouthOpenClasses = new String[5]
-	SubMouthOpenClasses[0] = "BJ"
-	SubMouthOpenClasses[1] = "ApPJ"
-	SubMouthOpenClasses[2] = "VBJ"
-	SubMouthOpenClasses[3] = "HhBJ"
-	SubMouthOpenClasses[4] = "HhPJ"
-
-	DomMouthOpenClasses = new String[5]
-	DomMouthOpenClasses[0] = "VJ"
-	DomMouthOpenClasses[1] = "VBJ"
-	DomMouthOpenClasses[2] = "VHJ"
-	DomMouthOpenClasses[3] = "BoF"
-	DomMouthOpenClasses[4] = "SJ"
 EndFunction
 
 Function SetDefaultSettings()
