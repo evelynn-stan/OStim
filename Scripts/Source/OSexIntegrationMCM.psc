@@ -50,7 +50,6 @@ Int SetDomLightBrightness
 Int SetOnlyLightInDark
 
 Int SetResetState
-Int SetRebuildDatabase
 
 ; keymapping settings
 Int SetKeymap
@@ -361,7 +360,6 @@ Event OnPageReset(String Page)
 
 		AddColoredHeader("$ostim_header_system")
 		SetResetState = AddTextOption("$ostim_reset_state", "")
-		SetRebuildDatabase = AddTextOption("$ostim_rebuild_database", "")
 		SetUpdate = AddTextOption("$ostim_update", "")
 		SetMute = AddToggleOption("$ostim_mute_osa", Main.MuteOSA)
 		SetTutorialMessages = AddToggleOption("$ostim_tutorial", Main.ShowTutorials)
@@ -671,9 +669,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetUpdate)
 		ShowMessage("$ostim_message_update_close_menus", false)
 		OUtils.ForceOUpdate()
-	ElseIf (Option == SetRebuildDatabase)
-		ShowMessage("$ostim_message_rebuild_database", false)
-		Main.GetODatabase().InitDatabase()
 	ElseIf (Option == SetActorSpeedControl)
 		Main.EnableActorSpeedControl = !Main.EnableActorSpeedControl
 		SetToggleOptionValue(Option, Main.EnableActorSpeedControl)
@@ -1009,8 +1004,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_control_toggle_key")
 	ElseIf (Option == SetOnlyLightInDark)
 		SetInfoText("$ostim_tooltip_dark_light")
-	ElseIf (Option == SetRebuildDatabase)
-		SetInfoText("$ostim_tooltip_rebuild_database")
 	ElseIf (Option == SetsexExcitementMult)
 		SetInfoText("$ostim_tooltip_excitement_mult")
 	ElseIf (Option == SetKeymap)
