@@ -4,7 +4,6 @@ ScriptName OsexIntegrationMCM Extends SKI_ConfigBase
 Int SetActorSpeedControl
 Int SetsexExcitementMult
 Int SetClipinglessFirstPerson
-Int SetDisableHitbox
 Int SetEndAfterActorHit
 Int SetUseRumble
 Int SetUseScreenShake
@@ -86,9 +85,6 @@ Int SetForceAIForMasturbation
 ; misc settings afaik
 Int SetCustomTimescale
 int SetTutorialMessages
-
-Int SetMisallignmentOption
-Int SetFlipFix
 
 Int SetUseFades
 Int SetUseAutoFades
@@ -314,10 +310,7 @@ Event OnPageReset(String Page)
 		SetActorSpeedControl = AddToggleOption("$ostim_speed_control", Main.EnableActorSpeedControl)
 		SetsexExcitementMult = AddSliderOption("$ostim_excitement_mult", Main.SexExcitementMult, "{2} x")
 		SetClipinglessFirstPerson = AddToggleOption("$ostim_clippingless", Main.EnableImprovedCamSupport)
-		SetDisableHitbox = AddToggleOption("$ostim_disable_hitbox", Main.disableplayerhitbox)
 		SetCustomTimescale = AddSliderOption("$ostim_timescale", Main.CustomTimescale, "{0}")
-		SetMisallignmentOption = AddToggleOption("$ostim_misallignment", Main.MisallignmentProtection)
-		SetFlipFix = AddToggleOption("$ostim_flip_fix", Main.FixFlippedAnimations)
 		SetUseFades = AddToggleOption("$ostim_use_fades", Main.UseFades)
 		SetEndAfterActorHit = AddToggleOption("$ostim_end_on_hit", Main.EndAfterActorHit)
 		SetUseRumble = AddToggleOption("$ostim_use_rumble", Main.UseRumble)
@@ -659,9 +652,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetEndOnSubOrgasm)
 		Main.EndOnSubOrgasm = !Main.EndOnSubOrgasm
 		SetToggleOptionValue(SetEndOnSubOrgasm, Main.EndOnSubOrgasm)
-	ElseIf (Option == SetDisableHitbox)
-		Main.DisablePlayerHitbox = !Main.DisablePlayerHitbox
-		SetToggleOptionValue(SetDisableHitbox, Main.DisablePlayerHitbox)
 	ElseIf (Option == SetEndOnBothOrgasm)
 		Main.RequireBothOrgasmsToFinish = !Main.RequireBothOrgasmsToFinish
 		SetToggleOptionValue(SetEndOnBothOrgasm, Main.RequireBothOrgasmsToFinish)
@@ -695,9 +685,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetStrongerUnequip)
 		Main.UseStrongerUnequipMethod = !Main.UseStrongerUnequipMethod
 		SetToggleOptionValue(Option, Main.UseStrongerUnequipMethod)
-	ElseIf (Option == SetFlipFix)
-		Main.FixFlippedAnimations = !Main.FixFlippedAnimations
-		SetToggleOptionValue(Option, Main.FixFlippedAnimations)
 	ElseIf (Option == SetUseScreenShake)
 		Main.UseScreenShake = !Main.UseScreenShake
 		SetToggleOptionValue(Option, Main.UseScreenShake)
@@ -770,9 +757,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetAnimateRedress)
 		Main.FullyAnimateRedress = !Main.FullyAnimateRedress
 		SetToggleOptionValue(Option, Main.FullyAnimateRedress)
-	ElseIf (Option == SetMisallignmentOption)
-		Main.MisallignmentProtection = !Main.MisallignmentProtection
-		SetToggleOptionValue(Option, Main.MisallignmentProtection)
 	ElseIf (Option == SetSubBar)
 		Main.EnableSubBar = !Main.EnableSubBar
 		SetToggleOptionValue(Option, Main.EnableSubBar)
@@ -925,8 +909,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_rumble")
 	ElseIf (Option == SetMatchColorToGender)
 		SetInfoText("$ostim_tooltip_gendered_colors")
-	ElseIf (Option == SetDisableHitbox)
-		SetInfoText("$ostim_tooltip_no_hitbox")
 	ElseIf (Option == SetHideNPCOnNPCBars)
 		SetInfoText("$ostim_tooltip_npc_bars")
 	ElseIf (Option == SetStrongerUnequip)
@@ -955,8 +937,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_auto_fades")
 	ElseIf (Option == SetAIChangeChance)
 		SetInfoText("$ostim_tooltip_ai_change_chance")
-	ElseIf (Option == SetFlipFix)
-		SetInfoText("$ostim_tooltip_flip_fix")
 	ElseIf (Option == SetDropClothes)
 		SetInfoText("$ostim_tooltip_drop_clothes")
 	ElseIf (Option == SetAlwaysUndressAtStart)
@@ -971,8 +951,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_third_bar")
 	ElseIf (Option == SetSubBar)
 		SetInfoText("$ostim_tooltip_sub_bar")
-	ElseIf (Option == SetMisallignmentOption)
-		SetInfoText("$ostim_tooltip_misalignment")
 	ElseIf (Option == SetEnableBeds)
 		SetInfoText("$ostim_tooltip_enable_beds")
 	ElseIf (Option == SetTutorialMessages)
@@ -1394,7 +1372,6 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetEndOnOrgasm", Main.EndOnDomOrgasm as Int)
 	JMap.SetInt(OstimSettingsFile, "SetEndOnSubOrgasm", Main.EndOnSubOrgasm as Int)
 	JMap.SetInt(OstimSettingsFile, "SetEndOnBothOrgasm", Main.RequireBothOrgasmsToFinish as Int)
-	JMap.SetInt(OstimSettingsFile, "SetDisableHitbox", Main.DisablePlayerHitbox as Int)
 	JMap.SetInt(OstimSettingsFile, "SetActorSpeedControl", Main.EnableActorSpeedControl as Int)
 	JMap.SetInt(OstimSettingsFile, "SetResetPosition", Main.ResetPosAfterSceneEnd as Int)
 	JMap.SetFlt(OstimSettingsFile, "SetsexExcitementMult", Main.SexExcitementMult as Float)
@@ -1483,9 +1460,6 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetCustomTimescale", Main.CustomTimescale as Int)
 
 	JMap.SetInt(OstimSettingsFile, "SetTutorialMessages", Main.ShowTutorials as Int)
-
-	JMap.SetInt(OstimSettingsFile, "SetMisallignmentOption", Main.MisallignmentProtection as Int)
-	JMap.SetInt(OstimSettingsFile, "SetFlipFix", Main.FixFlippedAnimations as Int)
 
 	JMap.SetInt(OstimSettingsFile, "SetUseFades", Main.UseFades as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUseAutoFades", Main.UseAutoFades as Int)
@@ -1632,7 +1606,6 @@ Function ImportSettings(bool default = false)
 	Main.EndOnDomOrgasm = Jmap.GetInt(OstimSettingsFile, "SetEndOnOrgasm")
 	Main.EndOnSubOrgasm = JMap.GetInt(OstimSettingsFile, "SetEndOnSubOrgasm")
 	Main.RequireBothOrgasmsToFinish = JMap.GetInt(OstimSettingsFile, "SetEndOnBothOrgasm")
-	Main.DisablePlayerHitbox = JMap.GetInt(OstimSettingsFile, "SetDisableHitbox")
 	Main.EnableActorSpeedControl = JMap.GetInt(OstimSettingsFile, "SetActorSpeedControl")
 	Main.ResetPosAfterSceneEnd = JMap.GetInt(OstimSettingsFile, "SetResetPosition")
 	Main.SexExcitementMult = JMap.GetFlt(OstimSettingsFile, "SetsexExcitementMult")
@@ -1725,9 +1698,6 @@ Function ImportSettings(bool default = false)
 
 	; Misc settings export.
 	Main.CustomTimescale = JMap.GetInt(OstimSettingsFile, "SetCustomTimescale")
-	
-	Main.MisallignmentProtection = JMap.GetInt(OstimSettingsFile, "SetMisallignmentOption")
-	Main.FixFlippedAnimations = JMap.GetInt(OstimSettingsFile, "SetFlipFix")
 	
 	Main.UseFades = JMap.GetInt(OstimSettingsFile, "SetUseFades")
 	Main.UseAutoFades = JMap.GetInt(OstimSettingsFile, "SetUseAutoFades")
