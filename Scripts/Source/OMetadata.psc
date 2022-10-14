@@ -1,7 +1,7 @@
-;/* OData
-* * collection of native functions refering to scene data
+;/* OMetadata
+* * collection of native functions refering to scene metadata
 */;
-ScriptName OData
+ScriptName OMetadata
 
 
 ; ████████╗ █████╗  ██████╗ ███████╗
@@ -194,6 +194,50 @@ int[] Function FindActionsForActor(string Id, int Position, string Type) Global 
 */;
 int[] Function FindAllActionsForActor(string Id, int Position, string[] Types) Global Native
 
+;/* FindActionForActors
+* * returns the first occurance of an action from a list of actors in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the actors in the scene
+* * @param: Type, the action type
+* *
+* * @return: the index of the first occurance of the action type if it occurs, otherwise -1
+*/;
+int Function FindActionForActors(string Id, int[] Positions, string Type) Global Native
+
+;/* FindAnyActionForActors
+* * returns the first occurance of any of a list of actions from a list of actors in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the actors in the scene
+* * @param: Types, and array of action types
+* * 
+* * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
+*/;
+int Function FindAnyActionForActors(string Id, int[] Positions, string[] Types) Global Native
+
+;/* FindActionsForActors
+* * returns all occurances of an action from a list of actors in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the actors in the scene
+* * @param: Type, the action type
+* *
+* * @return: an array of the indices of all occurances of the action type
+*/;
+int[] Function FindActionsForActors(string Id, int[] Positions, string Type) Global Native
+
+;/* FindAllActionsForActors
+* * returns all occurances of any of a list of actions from a list of actors in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the actors in the scene
+* * @param: Types, an array of action types
+* * 
+* * @return: an array of the indices of all occurances of any of the action types
+*/;
+int[] Function FindAllActionsForActors(string Id, int[] Positions, string[] Types) Global Native
+
 ;/* FindActionForTarget
 * * returns the first occurance of an action from a target in a scene
 * * 
@@ -238,6 +282,50 @@ int[] Function FindActionsForTarget(string Id, int Position, string Type) Global
 */;
 int[] Function FindAllActionsForTarget(string Id, int Position, string[] Types) Global Native
 
+;/* FindActionForTargets
+* * returns the first occurance of an action from a list of targets in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the targets in the scene
+* * @param: Type, the action type
+* *
+* * @return: the index of the first occurance of the action type if it occurs, otherwise -1
+*/;
+int Function FindActionForTargets(string Id, int[] Positions, string Type) Global Native
+
+;/* FindAnyActionForTargets
+* * returns the first occurance of any of a list of actions from a list of targets in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the targets in the scene
+* * @param: Types, and array of action types
+* * 
+* * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
+*/;
+int Function FindAnyActionForTargets(string Id, int[] Positions, string[] Types) Global Native
+
+;/* FindActionsForTargets
+* * returns all occurances of an action from a list of targets in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the targets in the scene
+* * @param: Type, the action type
+* *
+* * @return: an array of the indices of all occurances of the action type
+*/;
+int[] Function FindActionsForTargets(string Id, int[] Positions, string Type) Global Native
+
+;/* FindAllActionsForTargets
+* * returns all occurances of any of a list of actions from a list of targets in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the targets in the scene
+* * @param: Types, an array of action types
+* * 
+* * @return: an array of the indices of all occurances of any of the action types
+*/;
+int[] Function FindAllActionsForTargets(string Id, int[] Positions, string[] Types) Global Native
+
 ;/* FindActionForPerformer
 * * returns the first occurance of an action from a performer in a scene
 * * 
@@ -281,6 +369,50 @@ int[] Function FindActionsForPerformer(string Id, int Position, string Type) Glo
 * * @return: an array of the indices of all occurances of any of the action types
 */;
 int[] Function FindAllActionsForPerformer(string Id, int Position, string[] Types) Global Native
+
+;/* FindActionForPerformers
+* * returns the first occurance of an action from a list of performers in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the performers in the scene
+* * @param: Type, the action type
+* *
+* * @return: the index of the first occurance of the action type if it occurs, otherwise -1
+*/;
+int Function FindActionForPerformers(string Id, int[] Positions, string Type) Global Native
+
+;/* FindAnyActionForPerformers
+* * returns the first occurance of any of a list of actions from a list of performers in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the performers in the scene
+* * @param: Types, and array of action types
+* * 
+* * @return: the index of the first occurance of any of the action types if one occurs, otherwise -1
+*/;
+int Function FindAnyActionForPerformers(string Id, int[] Positions, string[] Types) Global Native
+
+;/* FindActionsForPerformers
+* * returns all occurances of an action from a list of performers in a scene
+* * 
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the performers in the scene
+* * @param: Type, the action type
+* *
+* * @return: an array of the indices of all occurances of the action type
+*/;
+int[] Function FindActionsForPerformers(string Id, int[] Positions, string Type) Global Native
+
+;/* FindAllActionsForPerformers
+* * returns all occurances of any of a list of actions from a list of performers in a scene
+* *
+* * @param: Id, the id of the scene
+* * @param: Positions, an array of indices of the performers in the scene
+* * @param: Types, an array of action types
+* * 
+* * @return: an array of the indices of all occurances of any of the action types
+*/;
+int[] Function FindAllActionsForPerformers(string Id, int[] Positions, string[] Types) Global Native
 
 ;/* GetActionTypes
 * * return all action types for a scene
