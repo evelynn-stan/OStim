@@ -167,11 +167,6 @@ Bool Property Installed auto
 
 Int[] Property StrippingSlots Auto
 
-Float Property DomScaleHeight Auto
-Float Property SubScaleHeight Auto ;adjusting these then calling a rescale will let you control actors scaling heights.
-Float Property ThirdScaleHeight Auto
-; The default OSA scale heights are set here by default
-
 Bool Property DisableScaling Auto
 
 int Property InstalledVersion Auto
@@ -243,7 +238,6 @@ Int CurrentOID ; the OID is the JMap ID of the current animation. You can feed t
 Int LastHubOID
 Bool CurrentAnimIsAggressive
 int[] PenisAngles
-float[] ActorScales
 ;--
 
 Bool property AIRunning auto
@@ -460,11 +454,6 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		PenisAngles[0] = 0
 		PenisAngles[1] = 0
 		PenisAngles[2] = 0
-
-		ActorScales = new float[3]
-		ActorScales[0] = 1.03
-		ActorScales[1] = 1.0
-		ActorScales[2] = 1.0
 	ElseIf SubActor
 		Actors = new Actor[2]
 		Actors[0] = DomActor
@@ -473,19 +462,12 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		PenisAngles = new int[2]
 		PenisAngles[0] = 0
 		PenisAngles[1] = 0
-
-		ActorScales = new float[2]
-		ActorScales[0] = 1.03
-		ActorScales[1] = 1.0
 	Else
 		Actors = new Actor[1]
 		Actors[0] = DomActor
 
 		PenisAngles = new int[1]
 		PenisAngles[0] = 0
-
-		ActorScales = new float[1]
-		ActorScales[0] = 1.03
 	EndIf
 
 	If (Aggressive)
@@ -2190,11 +2172,6 @@ Function OnAnimationChange()
 
 			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
 			PenisAngles = PapyrusUtil.PushInt(PenisAngles, 0)
-			ActorScales = PapyrusUtil.PushFloat(ActorScales, 1.0)
-
-			if !DisableScaling
-				ScaleToStandardHeight(ThirdActor)
-			EndIf
 
 			SendModEvent("ostim_thirdactor_join")
 		Else
@@ -2211,7 +2188,6 @@ Function OnAnimationChange()
 
 		Actors = PapyrusUtil.ResizeActorArray(Actors, 2)
 		PenisAngles = PapyrusUtil.ResizeIntArray(PenisAngles, 2)
-		ActorScales = PapyrusUtil.ResizeFloatArray(ActorScales, 2)
 
 		if !DisableScaling
 			ThirdActor.SetScale(1.0)
@@ -2229,6 +2205,11 @@ Function OnAnimationChange()
 
 	While i
 		i -= 1
+
+		If(!DisableScaling)
+			OSANative.ScaleActor(Actors[i], CurrentSceneID, i)
+		EndIf
+
 		int oldPenisAngle = PenisAngles[i]
 		PenisAngles[i] = ODatabase.GetPenisAngle(CurrentOID, i)
 
@@ -2300,80 +2281,6 @@ Event OnActorHit(String EventName, String zAnimation, Float NumArg, Form Sender)
 		EndAnimation(False)
 	EndIf
 EndEvent
-
-Float LastVehicleTime
-Event OnSetVehicle(String EventName, String zAnimation, Float NumArg, Form Sender)
-	If (Game.GetRealHoursPassed() - LastVehicleTime) < 0.000833 ; 3 seconds
-		Utility.Wait(2)
-	EndIf
-	LastVehicleTime = Game.GetRealHoursPassed()
-
-	Console("Set vehicle fired")
-
-	If (!DisableScaling)
-		ScaleAll()
-	Else
-		RestoreScales()
-	EndIf
-EndEvent
-
-function ScaleAll()
-	If (DomActor)
-		ScaleToStandardHeight(DomActor)
-	endif
-	If (SubActor)
-		ScaleToStandardHeight(SubActor)
-	EndIf
-	If (ThirdActor)
-		ScaleToStandardHeight(ThirdActor)
-	EndIf
-Endfunction
-
-Function ScaleToStandardHeight(Actor Act)
-	Float GoalBodyScale
-	If (Act == DomActor)
-		GoalBodyScale = DomScaleHeight
-	ElseIf (Act == SubActor)
-		GoalBodyScale = SubScaleHeight
-	Else
-		GoalBodyScale = ThirdScaleHeight
-	EndIf
-
-	ScaleToHeight(Act, GoalBodyScale)
-EndFunction
-
-Function ScaleToHeight(Actor Act, Float GoalBodyScale)
-	Float NativeBodyScale = outils.GetOriginalScale(act)
-	Float Scale = ((GoalBodyScale - NativeBodyScale) / NativeBodyScale) + 1.0
-
-	;Console(act.GetDisplayName())
-	;Console("Native scale: " + NativeBodyScale)
-
-	If (Scale < 1.01)  && (Scale > 0.99) ; there is some floating point imprecision with the above.
-		if (math.abs(act.GetScale() - NativeBodyScale)) < 0.01 ; the actor is truly the same size as their original size
-			Console("Scale not needed")
-			Return ; no need to scale and update ninode
-		else 
-			; continue on, actor needs a scale reset
-			scale = 1.0
-		endif 
-	EndIf
-
-	Console("Setting scale: " + Scale)
-
-	If Scale < 0.01
-		Console("Error: an unknown mod is conflicting with OStim's scaling. OStim will now dump scaling data")
-		Console("Name: " + act.GetDisplayName())
-		Console("Target scale: " + GoalBodyScale)
-		Console("Current scale: " + Act.GetScale())
-		Console("Disabling scaling in the MCM will stop this message")
-		return 
-	EndIf
-
-	Act.SetScale(Scale)
-	Act.QueueNiNodeUpdate() ; This will cause actors to reqequip clothes if mid-scene
-	Act.SetScale(Scale)
-EndFunction
 
 Function RestoreScales()
 	If (DomActor)
@@ -3266,10 +3173,6 @@ UseFreeCam
 
 	SpeedUpNonSexAnimation = False ;game pauses if anim finished early
 	SpeedUpSpeed = 1.5
-
-	DomScaleHeight = 1.03 ; male height
-	SubScaleHeight = 1.00 ; female height
-	ThirdScaleHeight = 1.03
 
 	disablescaling = false
 

@@ -158,32 +158,6 @@ int Function GetPenisAngle(int Animation, int Position)
 	Return JMap.GetInt(GetActorProperties(Animation, Position), "penisAngle", 0)
 EndFunction
 
-float Function GetScale(int Animation, int Position)
-	float Default = 1.0
-	If Position == 0
-		Default = 1.03
-	EndIf
-	
-	Return JMap.Getflt(GetActorProperties(Animation, Position), "scale", Default)
-EndFunction
-
-; to avoid conflict all tags are serialized in lowercase!
-bool Function HasTag(int Animation, string Tag)
-	Return JArray.findStr(JMap.getObj(Animation, "tags"), Tag) != -1
-EndFunction
-
-string[] Function GetTags(int Animation)
-	Return JArray.asStringArray(JMap.getObj(Animation, "tags"))
-EndFunction
-
-bool Function HasPositionTag(int Animation, int Position, string Tag)
-	Return JArray.findStr(JMap.getObj(getActorProperties(Animation, Position), "tags"), Tag) != -1
-EndFunction
-
-string[] Function GetPositionTags(int Animation, int Position)
-	Return JArray.asStringArray(JMap.getObj(getActorProperties(Animation, Position), "tags"))
-EndFunction
-
 ;----------------------------------------------
 ;  	Retrieve OArray of animations from Database
 ;-----------------------------------------------
