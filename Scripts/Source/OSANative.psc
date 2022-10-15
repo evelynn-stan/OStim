@@ -39,6 +39,19 @@ actor[] Function RemoveActorsWithGender(actor[] actors, int gender) Global Nativ
 
 form[] Function GetEquippedAmmo(actor act) Global Native
 
+Function ScaleActor(Actor act, string id, int position) Global Native
+
+Function ScaleActorInner(Actor act, float scale, float scaleHeight) Global
+	bool IsFemale = act.GetActorBase().GetSex() == 1
+
+	If nioverride.HasNodeTransformPosition(act, false, IsFemale, "NPC", "internal")
+		float offset = nioverride.GetNodeTransformPosition(act, false, IsFemale, "NPC", "internal")[2]
+		scale = scale * (scaleHeight / (scaleHeight + offset))
+	EndIf
+
+	act.SetScale(scale)
+EndFunction
+
 
 ;  ██████╗ █████╗ ███╗   ███╗███████╗██████╗  █████╗
 ; ██╔════╝██╔══██╗████╗ ████║██╔════╝██╔══██╗██╔══██╗
