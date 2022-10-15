@@ -439,8 +439,6 @@ Event AnimatedRedressThread(String EventName, String StrArg, float NumArg, Form 
 
 	Float StartingHealth = Target.GetAV("Health")
 
-	Utility.Wait(Utility.RandomFloat(0.45, 0.65))
-
 	Int i = 0
 	While (i < Items.Length)
 		If (Items[i])
@@ -458,43 +456,43 @@ Event AnimatedRedressThread(String EventName, String StrArg, float NumArg, Form 
 
 			If ArmorPiece.IsCuirass() || ArmorPiece.IsClothingBody()
 				If (Female)
-					UndressAnim = "0Eq0ER_F_ST_D_cuirass_0"
-					AnimLen = 9
-					DressPoint = 4.5
+					UndressAnim = "redress_torso"
+					AnimLen = 3
+					DressPoint = 1.5
 				Else
-					UndressAnim = "0Eq0ER_M_ST_D_cuirass_0"
-					AnimLen = 8
-					DressPoint = 5
+					UndressAnim = "redress_torso"
+					AnimLen = 3
+					DressPoint = 1.5
 				EndIf
 			ElseIf ArmorPiece.IsBoots() || ArmorPiece.IsClothingFeet()
 				If (Female)
-					UndressAnim = "0Eq0ER_F_SI_D_boots_0"
-					AnimLen = 17
-					DressPoint = 4.5
+					UndressAnim = "redress_feet"
+					AnimLen = 3
+					DressPoint = 2.9
 				Else
-					UndressAnim = "0Eq0ER_M_ST_D_boots_0"
-					AnimLen = 8
-					DressPoint = 5
+					UndressAnim = "redress_feet"
+					AnimLen = 3
+					DressPoint = 2.9
 				EndIf
 			ElseIf ArmorPiece.IsHelmet() || ArmorPiece.IsClothingHead()
 				If (Female)
-					UndressAnim = "0Eq0ER_F_ST_D_helmet_0"
-					AnimLen = 12.5
-					DressPoint = 9.5
+					UndressAnim = "redress_head"
+					AnimLen = 2
+					DressPoint = 1.6
 				Else
-					UndressAnim = "0Eq0ER_M_ST_D_helmet_0"
-					AnimLen = 5
-					DressPoint = 3
+					UndressAnim = "redress_head"
+					AnimLen = 2
+					DressPoint = 1.6
 				EndIf
 			ElseIf ArmorPiece.IsGauntlets() || ArmorPiece.IsClothingHands()
 				If (Female)
-					UndressAnim = "0Eq0ER_F_ST_D_gloves_0"
-					AnimLen = 12
-					DressPoint = 3
+					UndressAnim = "redress_hands"
+					AnimLen = 2
+					DressPoint = 1.9
 				Else
-					UndressAnim = "0Eq0ER_M_ST_D_gloves_0"
-					AnimLen = 8
-					DressPoint = 6.5
+					UndressAnim = "redress_hands"
+					AnimLen = 2
+					DressPoint = 1.9
 				EndIf
 			EndIf
 
