@@ -107,9 +107,6 @@ Int Property ControlToggleKey Auto
 
 Bool Property UseBed Auto
 
-Bool Property MisallignmentProtection Auto
-Bool Property DisablePlayerHitbox Auto
-
 Bool Property UseAIControl Auto
 Bool Property OnlyGayAnimsInGayScenes auto
 Bool Property PauseAI Auto
@@ -126,8 +123,6 @@ Bool Property UseAINonAggressive Auto
 Bool Property UseAIMasturbation Auto
 
 Bool Property MuteOSA Auto
-
-Bool Property FixFlippedAnimations Auto
 
 Bool Property UseFreeCam Auto
 
@@ -249,8 +244,6 @@ OAIScript AI
 OBarsScript OBars
 OUndressScript OUndress
 OStimUpdaterScript OUpdater
-
-Bool IsFlipped
 
 Float DomStimMult
 Float SubStimMult
@@ -528,8 +521,6 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
  
-
-	IsFlipped = False
 	StallOrgasm = false
 	CurrentSpeed = 0
 	DomExcitement = 0.0
@@ -699,21 +690,6 @@ Event OnUpdate() ;OStim main logic loop
 
 	StartTime = Utility.GetCurrentRealTime()
 
-	Bool WaitForActorsTouch = (SubActor && SubActor.GetDistance(DomActor) > 1) && (MisallignmentProtection)
-	Int WaitCycles = 0
-	While (WaitForActorsTouch) && (SceneRunning)
-		Utility.Wait(0.1)
-		WaitCycles += 1
-		WaitForActorsTouch = (SubActor.GetDistance(DomActor) > 10)
-
-		If (WaitCycles > 8)
-			AlternateRealign()
-		EndIf
-		If (WaitCycles > 10)
-			WaitForActorsTouch = False
-		EndIf
-	EndWhile
-
 	ReallignedDuringThisAnim = false
 
 	ToggleActorAI(True)
@@ -754,12 +730,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	if disableplayerhitbox && IsPlayerInvolved()
-		float[] stageCoords = OSANative.getcoords(GetOSAStage())
-		playerref.setposition(stageCoords[0]+128, stageCoords[1], stageCoords[2])
-		OSANative.SetPositionEx(playerref, stageCoords[0], stageCoords[1], stageCoords[2])
-	endif 
-
 	If (UseFreeCam) && IsPlayerInvolved()
 		;Utility.Wait(1)
 		ToggleFreeCam(True)
@@ -781,38 +751,6 @@ Event OnUpdate() ;OStim main logic loop
 
 		Utility.Wait(1.0 - LoopTimeTotal)
 		LoopStartTime = Utility.GetCurrentRealTime()
-
-		If (MisallignmentProtection && IsActorActive(DomActor)) && (!ReallignedDuringThisAnim)
-			If (SubActor && SubActor.GetDistance(DomActor) > 10)
-				Console("Misallignment detected")
-				ReallignedDuringThisAnim = true
-				AlternateRealign()
-				Utility.Wait(0.1)
-
-				Int i = 0
-				While ((SubActor.GetDistance(DomActor) > 5) && IsActorActive(DomActor))&& (i < 3)
-					Utility.Wait(0.25)
-					Console("Still misalligned... " + SubActor.GetDistance(DomActor))
-					Console("Disable Misallignment Protection if this is a frequent issue")
-
-					If AppearsFemale(SubActor)
-						DomActor.MoveTo(SubActor)
-						ElseIf AppearsFemale(DomActor)
-						SubActor.MoveTo(DomActor)
-					EndIf
-
-					AlternateRealign()
-
-					i += 1
-				EndWhile
-
-				If (SubActor.GetDistance(DomActor) < 1)
-					Console("Realligned")
-					Else
-					Console("Allignment failed")
-				EndIf
-			EndIf
-		EndIf
 
 		If (EnableActorSpeedControl && !AnimationIsAtMaxSpeed())
 			AutoIncreaseSpeed()
@@ -887,13 +825,6 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	ODatabase.Unload()
-
-	If (FixFlippedAnimations)
-		DomActor.SetDontMove(False)
-		If SubActor
-			SubActor.SetDontMove(False)
-		EndIf
-	EndIf
 
 	If (OSANative.IsFreeCam())
 		ToggleFreeCam(False)
@@ -1854,28 +1785,6 @@ Function AllignActorsWithCurrentBed()
 	SubActor.SetDontMove(False)
 EndFunction
 
-
-
-Function Flip()
-	Console("Flipping")
-	IsFlipped = !IsFlipped
-
-	ObjectReference Stage = GetOSAStage()
-
-	Stage.SetAngle(Stage.GetAngleX(), Stage.GetAngleY(), Stage.GetAngleZ() + 180) ; flip stage
-
-	DomActor.SetAngle(0, 0, Stage.GetAngleZ()) ; reangle
-	SubActor.SetAngle(0, 0, Stage.GetAngleZ())
-
-	DomActor.TranslateTo(Stage.x, Stage.y, Stage.z, 0, 0, Stage.GetAngleZ(), 150.0, 0) ; move into place
-	SubActor.TranslateTo(Stage.x, Stage.y, Stage.z, 0, 0, Stage.GetAngleZ(), 150.0, 0)
-
-	DomActor.SetVehicle(Stage)  ; fuse
-	SubActor.SetVehicle(Stage)
-
-	SendModEvent("ostim_setvehicle")
-EndFunction
-
 ObjectReference Function GetOSAStage() ; the stage is an invisible object that the actors are alligned on
 	Int StageID = DomActor.GetFactionRank(OSAOmni.OFaction[1])
 	ObjectReference stage = OSAOmni.GlobalPosition[StageID as Int]
@@ -2096,22 +2005,6 @@ Function OnAnimationChange()
 	EndIf
 
 	CurrAnimClass = CClass
-
-	If (FixFlippedAnimations)
-		If (!StringArrayContainsValue(ODatabase.OriginalModules, ODatabase.GetModule(CurrentOID)))
-			Console("On third party animation")
-			If (!IsFlipped)
-				If (StringUtil.Find(ODatabase.getFullName(CurrentOID), "noflip") == -1)
-					Flip()
-				EndIf
-			EndIf
-		Else
-			If (IsFlipped)
-				Console("Back on first-party animation")
-				Flip()
-			EndIf
-		EndIf
-	EndIf
 
 	ReallignedDuringThisAnim = False 
 
@@ -3114,13 +3007,9 @@ UseFreeCam
 
 	Usebed = True
 	BedSearchDistance = 15
-	MisallignmentProtection = false
-
-	DisablePlayerHitbox = false 
 
 	DisableStimulationCalculation = false
 
-	FixFlippedAnimations = False
 	OrgasmIncreasesRelationship = False
 	SlowMoOnOrgasm = True
 
