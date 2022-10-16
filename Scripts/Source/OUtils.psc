@@ -583,3 +583,24 @@ string[] Function StringArray(string one = "", string two = "", string three = "
 	endif
 
 EndFunction
+
+Function RestoreOffset(Actor act, float offset) Global
+	float[] offsets
+	bool isFemale = act.GetActorBase().GetSex() == 1
+
+	If nioverride.HasNodeTransformPosition(act, false, isFemale, "NPC", "internal")
+		offsets = nioverride.GetNodeTransformPosition(act, false, isFemale, "NPC", "internal")
+		If offsets[2] != 0
+			Return
+		EndIf
+		offsets[2] = offset
+	Else
+		offsets = new float[3]
+		offsets[0] = 0
+		offsets[1] = 0
+		offsets[2] = offset
+	EndIf
+
+	nioverride.AddNodeTransformPosition(act, false, isFemale, "NPC", "internal", offsets)
+	nioverride.UpdateNodeTransform(act, false, isFemale, "NPC")
+EndFunction

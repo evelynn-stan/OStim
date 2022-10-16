@@ -154,10 +154,6 @@ Bool Function HasPositionData(Int Animation, String Data) ; this supports partia
 	Return !(StringUtil.Find(SlotData, Data) == -1)
 EndFunction
 
-int Function GetPenisAngle(int Animation, int Position)
-	Return JMap.GetInt(GetActorProperties(Animation, Position), "penisAngle", 0)
-EndFunction
-
 ;----------------------------------------------
 ;  	Retrieve OArray of animations from Database
 ;-----------------------------------------------
