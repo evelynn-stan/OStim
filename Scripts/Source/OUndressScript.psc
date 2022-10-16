@@ -268,22 +268,21 @@ Event OStimPreStart(String EventName, String StrArg, Float NumArg, Form Sender)
 		OStim.UndressSub = True
 	EndIf
 
-	If (OStim.AlwaysAnimateUndress)
-		OStim.AnimateUndress = True
-	EndIf
-
 	If (OStim.UndressDom) ; animate undress, and chest-only strip not yet supported	
 		Strip(actors[0])
+		OStim.UnsetOffset(0)
 	EndIf
 
 	If (OStim.GetSubActor() && OStim.UndressSub)
 		Strip(actors[1])
+		OStim.UnsetOffset(1)
 	EndIf
 
 	; Assume if sub is to be undressed, third actor should also be provided ThirdActor exists.
 	
 	If (OStim.UndressSub && actors.length > 2)
-		Strip(actors[2])		
+		Strip(actors[2])
+		OStim.UnsetOffset(2)	
 	EndIf
 
 	
@@ -298,6 +297,8 @@ Event OstimChange(String eventName, String strArg, Float numArg, Form sender)
 		Bool SubNaked = True
 		Bool ThirdNaked = True
 
+		bool Rescale = false
+
 		If actors.length > 1
 			SubNaked = OStim.IsNaked(actors[1])
 			If actors.length > 2
@@ -309,20 +310,30 @@ Event OstimChange(String eventName, String strArg, Float numArg, Form sender)
 		If (!DomNaked)
 			If (CClass == "Sx") || (CClass == "Po") || (CClass == "HhPo") || (CClass == "ApPJ") || (CClass == "HhPJ") || (CClass == "HJ") || (CClass == "ApHJ") || (CClass == "DHJ") || (CClass == "SJ")|| (CClass == "An")|| (CClass == "BoJ")|| (CClass == "FJ")|| (CClass == "BJ")
 				Strip(actors[0])
+				OStim.UnsetOffset(0)
 				SendModEvent("ostim_midsceneundress_dom")
+				Rescale = true
 			EndIf
 		EndIf
 		If (!SubNaked)
 			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF") || (StringUtil.Find(OStim.GetCurrentAnimationSceneID(), "MutualMast") != -1)
 				Strip(actors[1])
+				OStim.UnsetOffset(1)
 				SendModEvent("ostim_midsceneundress_sub")
+				Rescale = true
 			EndIf
 		EndIf
 		If (!ThirdNaked)
 			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Cr") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF")
 				Strip(actors[2])
+				OStim.UnsetOffset(2)
 				SendModEvent("ostim_midsceneundress_third")
+				Rescale = true
 			EndIf
+		EndIf
+
+		If Rescale
+			Ostim.Rescale()
 		EndIf
 	EndIf
 EndEvent
@@ -332,6 +343,8 @@ Event OstimThirdJoin(String EventName, String StrArg, Float NumArg, Form Sender)
 	If (OStim.AlwaysUndressAtAnimStart)
 		Console("Stripping third actor")
 		Strip(actors[2])
+		OStim.UnsetOffset(2)
+		Ostim.Rescale()
 	EndIf	
 EndEvent
 

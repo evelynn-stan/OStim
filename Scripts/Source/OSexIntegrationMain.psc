@@ -43,13 +43,13 @@ Bool Property EnableSubBar Auto
 Bool Property EnableThirdBar Auto
 Bool Property AutoHideBars Auto
 Bool Property MatchBarColorToGender auto
-Bool Property HideBarsInNPCScenes auto ; MCM todo
+Bool Property HideBarsInNPCScenes auto
 
 Bool Property EnableImprovedCamSupport Auto
 
 Bool Property EnableActorSpeedControl Auto
 
-Bool Property ResetPosAfterSceneEnd Auto ; mcm todo
+Bool Property ResetPosAfterSceneEnd Auto
 
 Bool Property AllowUnlimitedSpanking Auto
 
@@ -65,8 +65,6 @@ Bool Property LowLightLevelLightsOnly Auto
 Bool Property SlowMoOnOrgasm Auto
 
 Bool Property AlwaysUndressAtAnimStart Auto
-Bool Property OnlyUndressChest Auto 		;	Removed in 4.0
-Bool Property AlwaysAnimateUndress Auto     ;	Removed in 4.0
 Bool Property TossClothesOntoGround Auto
 Bool Property UseStrongerUnequipMethod Auto
 Bool Property FullyAnimateRedress Auto
@@ -162,8 +160,6 @@ Bool Property Installed auto
 
 Int[] Property StrippingSlots Auto
 
-Bool Property DisableScaling Auto
-
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
@@ -177,6 +173,7 @@ Actor SubActor
 Actor ThirdActor
 
 Actor[] Actors
+float[] Offsets
 
 String diasa
 
@@ -204,7 +201,6 @@ GlobalVariable Timescale
 
 Bool Property UndressDom Auto
 Bool Property UndressSub Auto
-Bool Property AnimateUndress Auto
 String StartingAnimation
 
 
@@ -232,7 +228,6 @@ Int[] OSexControlKeys
 Int CurrentOID ; the OID is the JMap ID of the current animation. You can feed this in to ODatabase
 Int LastHubOID
 Bool CurrentAnimIsAggressive
-int[] PenisAngles
 ;--
 
 Bool property AIRunning auto
@@ -349,6 +344,20 @@ EndEvent
 
 
 ; Call this function to start a new OStim scene
+;/* StartScene
+* * starts an OStim scene, duh
+* *
+* * @param: Dom, the first actor, index 0, usually male
+* * @param: Sub, the second actor, index 1, usually female
+* * @param: zUndressDom, if True the first actor will get undressed no matter the MCM settings
+* * @param: zUndressSub, if True the second actor will get undressed no matter the MCM settings
+* * @param: zAnimateUndress, no longer in use
+* * @param: zStartingAnimation, the animation to start with
+* * @param: zThirdActor, the third actor, index 2
+* * @param: Bed, the bed to start the animation on, can be None
+* * @param: Aggressive, if the scene is aggressive
+* * @param: AggressingActor, the aggressor in an aggressive scene
+*/;
 Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zUndressSub = False, Bool zAnimateUndress = False, String zStartingAnimation = "", Actor zThirdActor = None, ObjectReference Bed = None, Bool Aggressive = False, Actor AggressingActor = None)
 	if !installed 
 		debug.Notification("OStim not ready or installation failed")
@@ -384,7 +393,6 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 
 	UndressDom = zUndressDom
 	UndressSub = zUndressSub
-	AnimateUndress = zAnimateUndress
 	StartingAnimation = zStartingAnimation
 	ThirdActor = zThirdActor
 	PauseAI = False
@@ -440,25 +448,30 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		Actors[1] = SubActor
 		Actors[2] = ThirdActor
 
-		PenisAngles = new int[3]
-		PenisAngles[0] = 0
-		PenisAngles[1] = 0
-		PenisAngles[2] = 0
+		Offsets = new float[3]
 	ElseIf SubActor
 		Actors = new Actor[2]
 		Actors[0] = DomActor
 		Actors[1] = SubActor
 
-		PenisAngles = new int[2]
-		PenisAngles[0] = 0
-		PenisAngles[1] = 0
+		Offsets = new float[2]
 	Else
 		Actors = new Actor[1]
 		Actors[0] = DomActor
 
-		PenisAngles = new int[1]
-		PenisAngles[0] = 0
+		Offsets = new float[1]
 	EndIf
+
+	int i = Actors.Length
+	While i
+		i -= 1
+
+		If nioverride.HasNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")
+			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")[2]
+		Else
+			Offsets[i] = 0
+		EndIf
+	EndWhile
 
 	If (Aggressive)
 		If (AggressingActor)
@@ -814,9 +827,19 @@ Event OnUpdate() ;OStim main logic loop
 
 	Console("Ending scene")
 
+
+	int i = Actors.Length
+	While i
+		i -= 1
+
+		If Offsets[i] != 0
+			OUtils.RestoreOffset(Actors[i], Offsets[i])
+		EndIf
+	EndWhile
+
 	SendModEvent("ostim_end", numArg = -1.0)
 
-	If !DisableScaling && !ForceCloseOStimThread
+	If !ForceCloseOStimThread
 		RestoreScales()
 	EndIf
 
@@ -1202,37 +1225,32 @@ Actor Function GetSexPartner(Actor Char)
 	Return SubActor
 EndFunction
 
+Actor Function GetActor(int Index)
+	If Index > 0 && Index < Actors.Length
+		Return Actors[Index]
+	EndIf
+
+	Return None
+EndFunction
+
+; deprecated, use GetActor(0) instead
 Actor Function GetDomActor()
-	Return DomActor
+	Return GetActor(0)
 EndFunction
 
+; deprecated, use GetActor(1) instead
 Actor Function GetSubActor()
-	Return SubActor
+	Return GetActor(1)
 EndFunction
 
+; deprecated, use GetActor(2) instead
 Actor Function GetThirdActor()
-	Return ThirdActor
+	Return GetActor(2)
 EndFunction
 
+; do not modify this array or OStim will break!
 Actor[] Function GetActors()
-	Actor[] ret
-	If ThirdActor
-		ret = new Actor[3]
-	ElseIf SubActor
-		ret = new Actor[2]
-	Else 
-		ret = new Actor[1]
-	EndIf
-
-	ret[0] = DomActor
-	If SubActor
-		ret[1] = SubActor
-		If ThirdActor
-			ret[2] = ThirdActor
-		EndIf 
-	EndIf
-
-	return ret
+	Return Actors
 EndFunction
 
 ;/
@@ -2039,7 +2057,12 @@ Function OnAnimationChange()
 			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx", "OnExThird")
 
 			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
-			PenisAngles = PapyrusUtil.PushInt(PenisAngles, 0)
+
+			Offsets = PapyrusUtil.PushFloat(Offsets, 0)
+			bool isFemale = IsFemale(Actors[2])
+			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
+				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
+			EndIf
 
 			SendModEvent("ostim_thirdactor_join")
 		Else
@@ -2055,11 +2078,14 @@ Function OnAnimationChange()
 		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx")
 
 		Actors = PapyrusUtil.ResizeActorArray(Actors, 2)
-		PenisAngles = PapyrusUtil.ResizeIntArray(PenisAngles, 2)
 
-		if !DisableScaling
-			ThirdActor.SetScale(1.0)
+		If Offsets[2] != 0
+			OUtils.RestoreOffset(Actors[2], Offsets[2])
 		EndIf
+
+		Offsets = PapyrusUtil.ResizeFloatArray(Offsets, 2)
+
+		ThirdActor.SetScale(1.0)
 
 		; Enable Precision mod collisions again for the actor that is leaving
 		TogglePrecisionForActor(ThirdActor, true)
@@ -2071,20 +2097,7 @@ Function OnAnimationChange()
 
 	int i = Actors.Length
 
-	While i
-		i -= 1
-
-		If(!DisableScaling)
-			OSANative.ScaleActor(Actors[i], CurrentSceneID, i)
-		EndIf
-
-		int oldPenisAngle = PenisAngles[i]
-		PenisAngles[i] = ODatabase.GetPenisAngle(CurrentOID, i)
-
-		If PenisAngles[i] != oldPenisAngle
-			Debug.SendAnimationEvent(Actors[i], "SOSBend" + PenisAngles[i])
-		EndIf
-	EndWhile
+	Rescale()
 
 	if sceneChange
 		SendModEvent("ostim_scenechanged")
@@ -2136,6 +2149,10 @@ Function RestoreScales()
 	If (ThirdActor)
 		ThirdActor.SetScale(1.0)
 	endif
+EndFunction
+
+Function Rescale()
+	OSANative.UpdateForScene(CurrentSceneID, Actors, Offsets)
 EndFunction
 
 ;
@@ -3003,8 +3020,6 @@ UseFreeCam
 	SpeedUpNonSexAnimation = False ;game pauses if anim finished early
 	SpeedUpSpeed = 1.5
 
-	disablescaling = false
-
 	Usebed = True
 	BedSearchDistance = 15
 
@@ -3602,4 +3617,8 @@ Function OnLoadGame()
 		OUtils.ForceOUpdate()
 	endif 
 
+EndFunction
+
+Function UnsetOffset(int Index)
+	Offsets[Index] = 0
 EndFunction

@@ -7,15 +7,12 @@ Int SetClipinglessFirstPerson
 Int SetEndAfterActorHit
 Int SetUseRumble
 Int SetUseScreenShake
-int SetScaling
 int SetResetPosition
 int SetOnlyGayAnimsInGayScenes
 
 ; clothes settings
 Int SetUndressIfNeed
-Int SetAlwaysAnimateUndress
 Int SetAlwaysUndressAtStart
-Int SetonlyUndressChest
 Int SetDropClothes
 int SetAnimateRedress
 Int SetStrongerUnequip
@@ -315,7 +312,6 @@ Event OnPageReset(String Page)
 		SetUseRumble = AddToggleOption("$ostim_use_rumble", Main.UseRumble)
 		SetUseScreenShake = AddToggleOption("$ostim_screenshake", Main.UseScreenShake)
 		SetForceFirstPerson = AddToggleOption("$ostim_force_first", Main.ForceFirstPersonAfter)
-		SetScaling = AddToggleOption("$ostim_scaling", Main.DisableScaling)
 		SetResetPosition = AddToggleOption("$ostim_reset_position", Main.ResetPosAfterSceneEnd) 		
 		AddEmptyOption()
 
@@ -368,8 +364,6 @@ Event OnPageReset(String Page)
 		SetDropClothes = AddToggleOption("$ostim_drop_clothes", Main.TossClothesOntoGround)
 		;SetStrongerUnequip = AddToggleOption("$ostim_stronger_unequip", Main.UseStrongerUnequipMethod) Likely redundant 
 		SetAnimateRedress= AddToggleOption("$ostim_animate_redress", Main.FullyAnimateRedress)
-		;SetAlwaysAnimateUndress = AddToggleOption("$ostim_always_animate_undress", Main.AlwaysAnimateUndress) Removed in 4.0, may be reimplemented but it was bugged
-		;SetonlyUndressChest = AddToggleOption("$ostim_only_chest", Main.OnlyUndressChest) REMOVED in 4.0
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_ai_control")
@@ -671,9 +665,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetTutorialMessages)
 		Main.ShowTutorials = !Main.ShowTutorials
 		SetToggleOptionValue(Option, Main.ShowTutorials)
-	ElseIf (Option == SetScaling)
-		Main.DisableScaling = !Main.DisableScaling
-		SetToggleOptionValue(Option, Main.DisableScaling)
 	ElseIf (Option == SetUseRumble)
 		Main.UseRumble = !Main.UseRumble
 		SetToggleOptionValue(Option, Main.UseRumble)
@@ -737,12 +728,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetAIControl)
 		Main.UseAIControl = !Main.UseAIControl
 		SetToggleOptionValue(Option, Main.UseAIControl)
-	ElseIf (Option == SetAlwaysAnimateUndress)
-		Main.AlwaysAnimateUndress = !Main.AlwaysAnimateUndress
-		SetToggleOptionValue(Option, Main.AlwaysAnimateUndress)
-	;ElseIf (Option == SetonlyUndressChest)
-	;	Main.OnlyUndressChest = !Main.OnlyUndressChest
-	;	SetToggleOptionValue(Option, Main.OnlyUndressChest)
 	ElseIf (Option == SetDomBar)
 		Main.EnableDomBar = !Main.EnableDomBar
 		SetToggleOptionValue(Option, Main.EnableDomBar)
@@ -894,8 +879,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_ai_masturbation")
 	ElseIf (Option == SetUseFades)
 		SetInfoText("$ostim_tooltip_fades")
-	ElseIf (Option == SetScaling)
-		SetInfoText("$ostim_tooltip_scaling")
 	ElseIf (Option == SetUseCosaveWorkaround)
 		SetInfoText("$ostim_tooltip_cosave")
 	ElseIf (Option == SetFreeCamFOV)
@@ -936,10 +919,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_drop_clothes")
 	ElseIf (Option == SetAlwaysUndressAtStart)
 		SetInfoText("$ostim_tooltip_always_undress")
-	ElseIf (Option == SetAlwaysAnimateUndress)
-		SetInfoText("$ostim_tooltip_always_animate_undress")
-	ElseIf (Option == SetonlyUndressChest)
-		SetInfoText("$ostim_tooltip_only_chest")
 	ElseIf (Option == SetDomBar)
 		SetInfoText("$ostim_tooltip_dom_bar")
 	ElseIf (Option == SetthirdBar)
@@ -1372,7 +1351,6 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetEndAfterActorHit", Main.EndAfterActorHit as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUseRumble", Main.UseRumble as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUseScreenShake", Main.UseScreenShake as Int)
-	JMap.SetInt(OstimSettingsFile, "SetScaling", Main.DisableScaling as Int)
 	JMap.SetInt(OstimSettingsFile, "SetOnlyGayAnimsInGayScenes", Main.OnlyGayAnimsInGayScenes as Int)
 
 	; Player roles settings.
@@ -1387,9 +1365,6 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetDropClothes", Main.TossClothesOntoGround as Int)
 	JMap.SetInt(OstimSettingsFile, "SetAnimateRedress", Main.FullyAnimateRedress as Int)
 	;JMap.SetInt(OstimSettingsFile, "SetStrongerUnequip", Main.UseStrongerUnequipMethod as Int)
-
-	; JMap.SetInt(OstimSettingsFile, "SetAlwaysAnimateUndress", Main.AlwaysAnimateUndress as Int) These have been removed in 4.0
-	; JMap.SetInt(OstimSettingsFile, "SetonlyUndressChest", Main.OnlyUndressChest as Int) These have been removed in 4.0
 
 	; Bar settings export.
 	JMap.SetInt(OstimSettingsFile, "SetSubBar", Main.EnableSubBar as Int)
@@ -1606,7 +1581,6 @@ Function ImportSettings(bool default = false)
 	Main.EndAfterActorHit = JMap.GetInt(OstimSettingsFile, "SetEndAfterActorHit")
 	Main.UseRumble = JMap.GetInt(OstimSettingsFile, "SetUseRumble")
 	Main.UseScreenShake = JMap.GetInt(OstimSettingsFile, "SetUseScreenShake")
-	Main.DisableScaling = JMap.GetInt(OstimSettingsFile, "SetScaling")
 	Main.OnlyGayAnimsInGayScenes = JMap.GetInt(OstimSettingsFile, "SetOnlyGayAnimsInGayScenes")
 
 	;Player Roles settings
@@ -1621,9 +1595,6 @@ Function ImportSettings(bool default = false)
 	Main.FullyAnimateRedress = JMap.GetInt(OstimSettingsFile, "SetAnimateRedress")
 	;Main.UseStrongerUnequipMethod = JMap.GetInt(OstimSettingsFile, "SetStrongerUnequip")
 	Main.AlwaysUndressAtAnimStart = JMap.GetInt(OstimSettingsFile, "SetAlwaysUndressAtStart")
-	
-	; Main.AlwaysAnimateUndress = JMap.GetInt(OstimSettingsFile, "SetAlwaysAnimateUndress") These have been removed in 4.0
-	; Main.OnlyUndressChest = JMap.GetInt(OstimSettingsFile, "SetonlyUndressChest") These have been removed in 4.0
 	
 	; Bar settings import.
 	Main.EnableSubBar = JMap.GetInt(OstimSettingsFile, "SetSubBar")
