@@ -1226,7 +1226,7 @@ Actor Function GetSexPartner(Actor Char)
 EndFunction
 
 Actor Function GetActor(int Index)
-	If Index > 0 && Index < Actors.Length
+	If Index >= 0 && Index < Actors.Length
 		Return Actors[Index]
 	EndIf
 
