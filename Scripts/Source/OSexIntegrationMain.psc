@@ -660,7 +660,7 @@ Event OnUpdate() ;OStim main logic loop
 		diasa = o + ".viewStage"
 	endif
 
-	OSANative.StartScene(Password, Actro)
+	
 
 	if !ThirdActor
 		CurrentAnimation = "0Sx0MF_Ho-St6RevCud+01T180"
@@ -691,6 +691,7 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	Password = DomActor.GetFactionRank(OsaFactionStage)
+	OSANative.StartScene(Password, Actro)
 	string EventName = "0SAO" + Password + "_AnimateStage"
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
@@ -2001,6 +2002,8 @@ Function OnAnimationChange()
 		sceneChange = true 
 	endif 
 	CurrentSceneID = newScene
+		
+	OSANative.ChangeAnimation(Password, CurrentSceneID)
 	;Profile("DB Lookup")
 
 	If (ODatabase.IsHubAnimation(CurrentOID))
