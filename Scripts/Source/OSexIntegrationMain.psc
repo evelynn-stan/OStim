@@ -43,13 +43,13 @@ Bool Property EnableSubBar Auto
 Bool Property EnableThirdBar Auto
 Bool Property AutoHideBars Auto
 Bool Property MatchBarColorToGender auto
-Bool Property HideBarsInNPCScenes auto ; MCM todo
+Bool Property HideBarsInNPCScenes auto
 
 Bool Property EnableImprovedCamSupport Auto
 
 Bool Property EnableActorSpeedControl Auto
 
-Bool Property ResetPosAfterSceneEnd Auto ; mcm todo
+Bool Property ResetPosAfterSceneEnd Auto
 
 Bool Property AllowUnlimitedSpanking Auto
 
@@ -65,8 +65,6 @@ Bool Property LowLightLevelLightsOnly Auto
 Bool Property SlowMoOnOrgasm Auto
 
 Bool Property AlwaysUndressAtAnimStart Auto
-Bool Property OnlyUndressChest Auto 		;	Removed in 4.0
-Bool Property AlwaysAnimateUndress Auto     ;	Removed in 4.0
 Bool Property TossClothesOntoGround Auto
 Bool Property UseStrongerUnequipMethod Auto
 Bool Property FullyAnimateRedress Auto
@@ -107,9 +105,6 @@ Int Property ControlToggleKey Auto
 
 Bool Property UseBed Auto
 
-Bool Property MisallignmentProtection Auto
-Bool Property DisablePlayerHitbox Auto
-
 Bool Property UseAIControl Auto
 Bool Property OnlyGayAnimsInGayScenes auto
 Bool Property PauseAI Auto
@@ -126,8 +121,6 @@ Bool Property UseAINonAggressive Auto
 Bool Property UseAIMasturbation Auto
 
 Bool Property MuteOSA Auto
-
-Bool Property FixFlippedAnimations Auto
 
 Bool Property UseFreeCam Auto
 
@@ -167,13 +160,6 @@ Bool Property Installed auto
 
 Int[] Property StrippingSlots Auto
 
-Float Property DomScaleHeight Auto
-Float Property SubScaleHeight Auto ;adjusting these then calling a rescale will let you control actors scaling heights.
-Float Property ThirdScaleHeight Auto
-; The default OSA scale heights are set here by default
-
-Bool Property DisableScaling Auto
-
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
@@ -184,6 +170,10 @@ bool property ShowTutorials auto
 
 Actor DomActor
 Actor SubActor
+Actor ThirdActor
+
+Actor[] Actors
+float[] Offsets
 
 String diasa
 
@@ -211,9 +201,7 @@ GlobalVariable Timescale
 
 Bool Property UndressDom Auto
 Bool Property UndressSub Auto
-Bool Property AnimateUndress Auto
 String StartingAnimation
-Actor ThirdActor
 
 
 
@@ -251,8 +239,6 @@ OAIScript AI
 OBarsScript OBars
 OUndressScript OUndress
 OStimUpdaterScript OUpdater
-
-Bool IsFlipped
 
 Float DomStimMult
 Float SubStimMult
@@ -331,9 +317,6 @@ Float[] MouthStimValues
 Float[] HandStimValues
 Float[] ClitStimValues
 
-String[] SubMouthOpenClasses
-String[] DomMouthOpenClasses
-
 Float[] AnusStimValues
 Float[] FeetStimValues
 Float[] BreastsStimValues
@@ -361,6 +344,20 @@ EndEvent
 
 
 ; Call this function to start a new OStim scene
+;/* StartScene
+* * starts an OStim scene, duh
+* *
+* * @param: Dom, the first actor, index 0, usually male
+* * @param: Sub, the second actor, index 1, usually female
+* * @param: zUndressDom, if True the first actor will get undressed no matter the MCM settings
+* * @param: zUndressSub, if True the second actor will get undressed no matter the MCM settings
+* * @param: zAnimateUndress, no longer in use
+* * @param: zStartingAnimation, the animation to start with
+* * @param: zThirdActor, the third actor, index 2
+* * @param: Bed, the bed to start the animation on, can be None
+* * @param: Aggressive, if the scene is aggressive
+* * @param: AggressingActor, the aggressor in an aggressive scene
+*/;
 Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zUndressSub = False, Bool zAnimateUndress = False, String zStartingAnimation = "", Actor zThirdActor = None, ObjectReference Bed = None, Bool Aggressive = False, Actor AggressingActor = None)
 	if !installed 
 		debug.Notification("OStim not ready or installation failed")
@@ -396,7 +393,6 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 
 	UndressDom = zUndressDom
 	UndressSub = zUndressSub
-	AnimateUndress = zAnimateUndress
 	StartingAnimation = zStartingAnimation
 	ThirdActor = zThirdActor
 	PauseAI = False
@@ -444,6 +440,38 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 	If ThirdActor
 		TogglePrecisionForActor(ThirdActor, false)
 	EndIf
+
+	; set actor properties
+	If ThirdActor
+		Actors = new Actor[3]
+		Actors[0] = DomActor
+		Actors[1] = SubActor
+		Actors[2] = ThirdActor
+
+		Offsets = new float[3]
+	ElseIf SubActor
+		Actors = new Actor[2]
+		Actors[0] = DomActor
+		Actors[1] = SubActor
+
+		Offsets = new float[2]
+	Else
+		Actors = new Actor[1]
+		Actors[0] = DomActor
+
+		Offsets = new float[1]
+	EndIf
+
+	int i = Actors.Length
+	While i
+		i -= 1
+
+		If nioverride.HasNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")
+			Offsets[i] = nioverride.GetNodeTransformPosition(Actors[i], False, Actors[i].GetActorBase().GetSex() == 1, "NPC", "internal")[2]
+		Else
+			Offsets[i] = 0
+		EndIf
+	EndWhile
 
 	If (Aggressive)
 		If (AggressingActor)
@@ -506,8 +534,6 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
  
-
-	IsFlipped = False
 	StallOrgasm = false
 	CurrentSpeed = 0
 	DomExcitement = 0.0
@@ -679,21 +705,6 @@ Event OnUpdate() ;OStim main logic loop
 
 	StartTime = Utility.GetCurrentRealTime()
 
-	Bool WaitForActorsTouch = (SubActor && SubActor.GetDistance(DomActor) > 1) && (MisallignmentProtection)
-	Int WaitCycles = 0
-	While (WaitForActorsTouch) && (SceneRunning)
-		Utility.Wait(0.1)
-		WaitCycles += 1
-		WaitForActorsTouch = (SubActor.GetDistance(DomActor) > 10)
-
-		If (WaitCycles > 8)
-			AlternateRealign()
-		EndIf
-		If (WaitCycles > 10)
-			WaitForActorsTouch = False
-		EndIf
-	EndWhile
-
 	ReallignedDuringThisAnim = false
 
 	ToggleActorAI(True)
@@ -734,12 +745,6 @@ Event OnUpdate() ;OStim main logic loop
 		EndIf
 	EndIf
 
-	if disableplayerhitbox && IsPlayerInvolved()
-		float[] stageCoords = OSANative.getcoords(GetOSAStage())
-		playerref.setposition(stageCoords[0]+128, stageCoords[1], stageCoords[2])
-		OSANative.SetPositionEx(playerref, stageCoords[0], stageCoords[1], stageCoords[2])
-	endif 
-
 	If (UseFreeCam) && IsPlayerInvolved()
 		;Utility.Wait(1)
 		ToggleFreeCam(True)
@@ -761,38 +766,6 @@ Event OnUpdate() ;OStim main logic loop
 
 		Utility.Wait(1.0 - LoopTimeTotal)
 		LoopStartTime = Utility.GetCurrentRealTime()
-
-		If (MisallignmentProtection && IsActorActive(DomActor)) && (!ReallignedDuringThisAnim)
-			If (SubActor && SubActor.GetDistance(DomActor) > 10)
-				Console("Misallignment detected")
-				ReallignedDuringThisAnim = true
-				AlternateRealign()
-				Utility.Wait(0.1)
-
-				Int i = 0
-				While ((SubActor.GetDistance(DomActor) > 5) && IsActorActive(DomActor))&& (i < 3)
-					Utility.Wait(0.25)
-					Console("Still misalligned... " + SubActor.GetDistance(DomActor))
-					Console("Disable Misallignment Protection if this is a frequent issue")
-
-					If AppearsFemale(SubActor)
-						DomActor.MoveTo(SubActor)
-						ElseIf AppearsFemale(DomActor)
-						SubActor.MoveTo(DomActor)
-					EndIf
-
-					AlternateRealign()
-
-					i += 1
-				EndWhile
-
-				If (SubActor.GetDistance(DomActor) < 1)
-					Console("Realligned")
-					Else
-					Console("Allignment failed")
-				EndIf
-			EndIf
-		EndIf
 
 		If (EnableActorSpeedControl && !AnimationIsAtMaxSpeed())
 			AutoIncreaseSpeed()
@@ -856,9 +829,19 @@ Event OnUpdate() ;OStim main logic loop
 
 	Console("Ending scene")
 
+
+	int i = Actors.Length
+	While i
+		i -= 1
+
+		If Offsets[i] != 0
+			OUtils.RestoreOffset(Actors[i], Offsets[i])
+		EndIf
+	EndWhile
+
 	SendModEvent("ostim_end", numArg = -1.0)
 
-	If !DisableScaling && !ForceCloseOStimThread
+	If !ForceCloseOStimThread
 		RestoreScales()
 	EndIf
 
@@ -867,13 +850,6 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	ODatabase.Unload()
-
-	If (FixFlippedAnimations)
-		DomActor.SetDontMove(False)
-		If SubActor
-			SubActor.SetDontMove(False)
-		EndIf
-	EndIf
 
 	If (OSANative.IsFreeCam())
 		ToggleFreeCam(False)
@@ -1251,37 +1227,32 @@ Actor Function GetSexPartner(Actor Char)
 	Return SubActor
 EndFunction
 
+Actor Function GetActor(int Index)
+	If Index >= 0 && Index < Actors.Length
+		Return Actors[Index]
+	EndIf
+
+	Return None
+EndFunction
+
+; deprecated, use GetActor(0) instead
 Actor Function GetDomActor()
-	Return DomActor
+	Return GetActor(0)
 EndFunction
 
+; deprecated, use GetActor(1) instead
 Actor Function GetSubActor()
-	Return SubActor
+	Return GetActor(1)
 EndFunction
 
+; deprecated, use GetActor(2) instead
 Actor Function GetThirdActor()
-	Return ThirdActor
+	Return GetActor(2)
 EndFunction
 
+; do not modify this array or OStim will break!
 Actor[] Function GetActors()
-	Actor[] ret
-	If ThirdActor
-		ret = new Actor[3]
-	ElseIf SubActor
-		ret = new Actor[2]
-	Else 
-		ret = new Actor[1]
-	EndIf
-
-	ret[0] = DomActor
-	If SubActor
-		ret[1] = SubActor
-		If ThirdActor
-			ret[2] = ThirdActor
-		EndIf 
-	EndIf
-
-	return ret
+	Return Actors
 EndFunction
 
 ;/
@@ -1834,28 +1805,6 @@ Function AllignActorsWithCurrentBed()
 	SubActor.SetDontMove(False)
 EndFunction
 
-
-
-Function Flip()
-	Console("Flipping")
-	IsFlipped = !IsFlipped
-
-	ObjectReference Stage = GetOSAStage()
-
-	Stage.SetAngle(Stage.GetAngleX(), Stage.GetAngleY(), Stage.GetAngleZ() + 180) ; flip stage
-
-	DomActor.SetAngle(0, 0, Stage.GetAngleZ()) ; reangle
-	SubActor.SetAngle(0, 0, Stage.GetAngleZ())
-
-	DomActor.TranslateTo(Stage.x, Stage.y, Stage.z, 0, 0, Stage.GetAngleZ(), 150.0, 0) ; move into place
-	SubActor.TranslateTo(Stage.x, Stage.y, Stage.z, 0, 0, Stage.GetAngleZ(), 150.0, 0)
-
-	DomActor.SetVehicle(Stage)  ; fuse
-	SubActor.SetVehicle(Stage)
-
-	SendModEvent("ostim_setvehicle")
-EndFunction
-
 ObjectReference Function GetOSAStage() ; the stage is an invisible object that the actors are alligned on
 	Int StageID = DomActor.GetFactionRank(OSAOmni.OFaction[1])
 	ObjectReference stage = OSAOmni.GlobalPosition[StageID as Int]
@@ -2038,28 +1987,6 @@ Event SyncActors(string eventName, string strArg, float numArg, Form sender)
 	endif
 endEvent
 
-Function OpenMouth(Actor Act)
-	Console("Opening mouth...")
-	String a = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(act))
-
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "1", numArg = 40)
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "0", numArg = 100)
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "5", numArg = 100)
-EndFunction
-
-Function CloseMouth(Actor Act)
-	Console("Closing mouth...")
-	String a = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(act)) 
-
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "1", numArg = 0)
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "0", numArg = 0)
-	SendModEvent("0SAA" + a + "_BlendPh", strArg = "5", numArg = 0)
-EndFunction
-
-Bool function MouthIsOpen(Actor Act)
-	Return (MfgConsoleFunc.GetPhoneme(Act, 0) > 75)
-EndFunction
-
 Function OnAnimationChange()
 	
 	Console("Changing animation...")
@@ -2099,22 +2026,6 @@ Function OnAnimationChange()
 
 	CurrAnimClass = CClass
 
-	If (FixFlippedAnimations)
-		If (!StringArrayContainsValue(ODatabase.OriginalModules, ODatabase.GetModule(CurrentOID)))
-			Console("On third party animation")
-			If (!IsFlipped)
-				If (StringUtil.Find(ODatabase.getFullName(CurrentOID), "noflip") == -1)
-					Flip()
-				EndIf
-			EndIf
-		Else
-			If (IsFlipped)
-				Console("Back on first-party animation")
-				Flip()
-			EndIf
-		EndIf
-	EndIf
-
 	ReallignedDuringThisAnim = False 
 
 	Int CorrectActorCount = ODatabase.GetNumActors(CurrentOID)
@@ -2148,8 +2059,12 @@ Function OnAnimationChange()
 			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendPh", "OnPhThird")
 			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx", "OnExThird")
 
-			if !DisableScaling
-				ScaleToStandardHeight(ThirdActor)
+			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
+
+			Offsets = PapyrusUtil.PushFloat(Offsets, 0)
+			bool isFemale = IsFemale(Actors[2])
+			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
+				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
 			EndIf
 
 			SendModEvent("ostim_thirdactor_join")
@@ -2165,9 +2080,15 @@ Function OnAnimationChange()
 		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendPh")
 		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx")
 
-		if !DisableScaling
-			ThirdActor.SetScale(1.0)
+		Actors = PapyrusUtil.ResizeActorArray(Actors, 2)
+
+		If Offsets[2] != 0
+			OUtils.RestoreOffset(Actors[2], Offsets[2])
 		EndIf
+
+		Offsets = PapyrusUtil.ResizeFloatArray(Offsets, 2)
+
+		ThirdActor.SetScale(1.0)
 
 		; Enable Precision mod collisions again for the actor that is leaving
 		TogglePrecisionForActor(ThirdActor, true)
@@ -2178,30 +2099,9 @@ Function OnAnimationChange()
 		SendModEvent("ostim_thirdactor_leave") ; careful, getthirdactor() won't work in this event
 	EndIf
 
+	int i = Actors.Length
 
-	If StringArrayContainsValue(SubMouthOpenClasses, GetCurrentAnimationClass())
-		If MouthIsOpen(SubActor)
-			;Console("Mouth already open")
-		Else
-			OpenMouth(SubActor)
-		Endif
-	Else
-		If MouthIsOpen(subactor)
-			CloseMouth(subactor)
-		Endif
-	Endif
-
-	If StringArrayContainsValue(DomMouthOpenClasses, GetCurrentAnimationClass())
-		If MouthIsOpen(DomActor)
-			;Console("Mouth already open")
-		Else
-			OpenMouth(DomActor)
-		Endif
-	Else
-		If MouthIsOpen(DomActor)
-			CloseMouth(DomActor)
-		EndIf
-	EndIf
+	Rescale()
 
 	if sceneChange
 		SendModEvent("ostim_scenechanged")
@@ -2243,80 +2143,6 @@ Event OnActorHit(String EventName, String zAnimation, Float NumArg, Form Sender)
 	EndIf
 EndEvent
 
-Float LastVehicleTime
-Event OnSetVehicle(String EventName, String zAnimation, Float NumArg, Form Sender)
-	If (Game.GetRealHoursPassed() - LastVehicleTime) < 0.000833 ; 3 seconds
-		Utility.Wait(2)
-	EndIf
-	LastVehicleTime = Game.GetRealHoursPassed()
-
-	Console("Set vehicle fired")
-
-	If (!DisableScaling)
-		ScaleAll()
-	Else
-		RestoreScales()
-	EndIf
-EndEvent
-
-function ScaleAll()
-	If (DomActor)
-		ScaleToStandardHeight(DomActor)
-	endif
-	If (SubActor)
-		ScaleToStandardHeight(SubActor)
-	EndIf
-	If (ThirdActor)
-		ScaleToStandardHeight(ThirdActor)
-	EndIf
-Endfunction
-
-Function ScaleToStandardHeight(Actor Act)
-	Float GoalBodyScale
-	If (Act == DomActor)
-		GoalBodyScale = DomScaleHeight
-	ElseIf (Act == SubActor)
-		GoalBodyScale = SubScaleHeight
-	Else
-		GoalBodyScale = ThirdScaleHeight
-	EndIf
-
-	ScaleToHeight(Act, GoalBodyScale)
-EndFunction
-
-Function ScaleToHeight(Actor Act, Float GoalBodyScale)
-	Float NativeBodyScale = outils.GetOriginalScale(act)
-	Float Scale = ((GoalBodyScale - NativeBodyScale) / NativeBodyScale) + 1.0
-
-	;Console(act.GetDisplayName())
-	;Console("Native scale: " + NativeBodyScale)
-
-	If (Scale < 1.01)  && (Scale > 0.99) ; there is some floating point imprecision with the above.
-		if (math.abs(act.GetScale() - NativeBodyScale)) < 0.01 ; the actor is truly the same size as their original size
-			Console("Scale not needed")
-			Return ; no need to scale and update ninode
-		else 
-			; continue on, actor needs a scale reset
-			scale = 1.0
-		endif 
-	EndIf
-
-	Console("Setting scale: " + Scale)
-
-	If Scale < 0.01
-		Console("Error: an unknown mod is conflicting with OStim's scaling. OStim will now dump scaling data")
-		Console("Name: " + act.GetDisplayName())
-		Console("Target scale: " + GoalBodyScale)
-		Console("Current scale: " + Act.GetScale())
-		Console("Disabling scaling in the MCM will stop this message")
-		return 
-	EndIf
-
-	Act.SetScale(Scale)
-	Act.QueueNiNodeUpdate() ; This will cause actors to reqequip clothes if mid-scene
-	Act.SetScale(Scale)
-EndFunction
-
 Function RestoreScales()
 	If (DomActor)
 		DomActor.SetScale(1.0)
@@ -2327,6 +2153,10 @@ Function RestoreScales()
 	If (ThirdActor)
 		ThirdActor.SetScale(1.0)
 	endif
+EndFunction
+
+Function Rescale()
+	OSANative.UpdateForScene(CurrentSceneID, Actors, Offsets)
 EndFunction
 
 ;
@@ -3146,21 +2976,6 @@ Function SetSystemVars()
 	ProstateStimValues[Feet] = 0.0
 	ProstateStimValues[Breasts] = 0.0
 	ProstateStimValues[Prostate] = 0.0
-
-
-	SubMouthOpenClasses = new String[5]
-	SubMouthOpenClasses[0] = "BJ"
-	SubMouthOpenClasses[1] = "ApPJ"
-	SubMouthOpenClasses[2] = "VBJ"
-	SubMouthOpenClasses[3] = "HhBJ"
-	SubMouthOpenClasses[4] = "HhPJ"
-
-	DomMouthOpenClasses = new String[5]
-	DomMouthOpenClasses[0] = "VJ"
-	DomMouthOpenClasses[1] = "VBJ"
-	DomMouthOpenClasses[2] = "VHJ"
-	DomMouthOpenClasses[3] = "BoF"
-	DomMouthOpenClasses[4] = "SJ"
 EndFunction
 
 Function SetDefaultSettings()
@@ -3209,21 +3024,11 @@ UseFreeCam
 	SpeedUpNonSexAnimation = False ;game pauses if anim finished early
 	SpeedUpSpeed = 1.5
 
-	DomScaleHeight = 1.03 ; male height
-	SubScaleHeight = 1.00 ; female height
-	ThirdScaleHeight = 1.03
-
-	disablescaling = false
-
 	Usebed = True
 	BedSearchDistance = 15
-	MisallignmentProtection = false
-
-	DisablePlayerHitbox = false 
 
 	DisableStimulationCalculation = false
 
-	FixFlippedAnimations = False
 	OrgasmIncreasesRelationship = False
 	SlowMoOnOrgasm = True
 
@@ -3816,4 +3621,8 @@ Function OnLoadGame()
 		OUtils.ForceOUpdate()
 	endif 
 
+EndFunction
+
+Function UnsetOffset(int Index)
+	Offsets[Index] = 0
 EndFunction

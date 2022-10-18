@@ -196,7 +196,7 @@ Function PickUpThings(Actor Target, ObjectReference[] Items)
 		If (Item)
 			If (PlayerRef.GetItemCount(Item) < 1)
 				Target.AddItem(Item, 1, True)
-				Target.EquipItem(Item.GetBaseObject(), False, True)
+				Target.EquipItemEx(Item.GetBaseObject(), equipSound = False)
 			endif
 		EndIf
 		i += 1
@@ -225,7 +225,7 @@ Function EquipForms(Actor Target, Form[] Items)
 	While (i < Items.Length)
 		Form Item = Items[i]
 		If (Item)
-			Target.EquipItem(Item, False, True)
+			Target.EquipItemEx(Item, equipSound = False)
 		EndIf
 		i += 1
 	EndWhile
@@ -268,22 +268,27 @@ Event OStimPreStart(String EventName, String StrArg, Float NumArg, Form Sender)
 		OStim.UndressSub = True
 	EndIf
 
-	If (OStim.AlwaysAnimateUndress)
-		OStim.AnimateUndress = True
-	EndIf
-
 	If (OStim.UndressDom) ; animate undress, and chest-only strip not yet supported	
 		Strip(actors[0])
+		If OStim.IntArrayContainsValue(OStim.Strippingslots, 37)
+			OStim.UnsetOffset(0)
+		EndIf
 	EndIf
 
 	If (OStim.GetSubActor() && OStim.UndressSub)
 		Strip(actors[1])
+		If OStim.IntArrayContainsValue(OStim.Strippingslots, 37)
+			OStim.UnsetOffset(1)
+		EndIf
 	EndIf
 
 	; Assume if sub is to be undressed, third actor should also be provided ThirdActor exists.
 	
 	If (OStim.UndressSub && actors.length > 2)
-		Strip(actors[2])		
+		Strip(actors[2])
+		If OStim.IntArrayContainsValue(OStim.Strippingslots, 37)
+			OStim.UnsetOffset(2)
+		EndIf	
 	EndIf
 
 	
@@ -298,6 +303,8 @@ Event OstimChange(String eventName, String strArg, Float numArg, Form sender)
 		Bool SubNaked = True
 		Bool ThirdNaked = True
 
+		bool Rescale = false
+
 		If actors.length > 1
 			SubNaked = OStim.IsNaked(actors[1])
 			If actors.length > 2
@@ -309,20 +316,36 @@ Event OstimChange(String eventName, String strArg, Float numArg, Form sender)
 		If (!DomNaked)
 			If (CClass == "Sx") || (CClass == "Po") || (CClass == "HhPo") || (CClass == "ApPJ") || (CClass == "HhPJ") || (CClass == "HJ") || (CClass == "ApHJ") || (CClass == "DHJ") || (CClass == "SJ")|| (CClass == "An")|| (CClass == "BoJ")|| (CClass == "FJ")|| (CClass == "BJ")
 				Strip(actors[0])
+				If OStim.IntArrayContainsValue(OStim.Strippingslots, 37)
+					OStim.UnsetOffset(0)
+				EndIf
 				SendModEvent("ostim_midsceneundress_dom")
+				Rescale = true
 			EndIf
 		EndIf
 		If (!SubNaked)
 			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF") || (StringUtil.Find(OStim.GetCurrentAnimationSceneID(), "MutualMast") != -1)
 				Strip(actors[1])
+				If OStim.IntArrayContainsValue(OStim.Strippingslots, 37)
+					OStim.UnsetOffset(1)
+				EndIf
 				SendModEvent("ostim_midsceneundress_sub")
+				Rescale = true
 			EndIf
 		EndIf
 		If (!ThirdNaked)
 			If (CClass == "Sx") || (CClass == "VJ") || (CClass == "Cr") || (CClass == "Pf1") || (CClass == "Pf2") || (CClass == "An")|| (CClass == "BoJ")|| (CClass == "BoF")
 				Strip(actors[2])
+				If OStim.IntArrayContainsValue(OStim.Strippingslots, 37)
+					OStim.UnsetOffset(2)
+				EndIf
 				SendModEvent("ostim_midsceneundress_third")
+				Rescale = true
 			EndIf
+		EndIf
+
+		If Rescale
+			Ostim.Rescale()
 		EndIf
 	EndIf
 EndEvent
@@ -332,6 +355,10 @@ Event OstimThirdJoin(String EventName, String StrArg, Float NumArg, Form Sender)
 	If (OStim.AlwaysUndressAtAnimStart)
 		Console("Stripping third actor")
 		Strip(actors[2])
+		If OStim.IntArrayContainsValue(OStim.Strippingslots, 37)
+			OStim.UnsetOffset(2)
+		EndIf
+		Ostim.Rescale()
 	EndIf	
 EndEvent
 
@@ -439,8 +466,6 @@ Event AnimatedRedressThread(String EventName, String StrArg, float NumArg, Form 
 
 	Float StartingHealth = Target.GetAV("Health")
 
-	Utility.Wait(Utility.RandomFloat(0.45, 0.65))
-
 	Int i = 0
 	While (i < Items.Length)
 		If (Items[i])
@@ -458,43 +483,43 @@ Event AnimatedRedressThread(String EventName, String StrArg, float NumArg, Form 
 
 			If ArmorPiece.IsCuirass() || ArmorPiece.IsClothingBody()
 				If (Female)
-					UndressAnim = "0Eq0ER_F_ST_D_cuirass_0"
-					AnimLen = 9
-					DressPoint = 4.5
+					UndressAnim = "redress_torso"
+					AnimLen = 3
+					DressPoint = 1.5
 				Else
-					UndressAnim = "0Eq0ER_M_ST_D_cuirass_0"
-					AnimLen = 8
-					DressPoint = 5
+					UndressAnim = "redress_torso"
+					AnimLen = 3
+					DressPoint = 1.5
 				EndIf
 			ElseIf ArmorPiece.IsBoots() || ArmorPiece.IsClothingFeet()
 				If (Female)
-					UndressAnim = "0Eq0ER_F_SI_D_boots_0"
-					AnimLen = 17
-					DressPoint = 4.5
+					UndressAnim = "redress_feet"
+					AnimLen = 3
+					DressPoint = 2.9
 				Else
-					UndressAnim = "0Eq0ER_M_ST_D_boots_0"
-					AnimLen = 8
-					DressPoint = 5
+					UndressAnim = "redress_feet"
+					AnimLen = 3
+					DressPoint = 2.9
 				EndIf
 			ElseIf ArmorPiece.IsHelmet() || ArmorPiece.IsClothingHead()
 				If (Female)
-					UndressAnim = "0Eq0ER_F_ST_D_helmet_0"
-					AnimLen = 12.5
-					DressPoint = 9.5
+					UndressAnim = "redress_head"
+					AnimLen = 2
+					DressPoint = 1.6
 				Else
-					UndressAnim = "0Eq0ER_M_ST_D_helmet_0"
-					AnimLen = 5
-					DressPoint = 3
+					UndressAnim = "redress_head"
+					AnimLen = 2
+					DressPoint = 1.6
 				EndIf
 			ElseIf ArmorPiece.IsGauntlets() || ArmorPiece.IsClothingHands()
 				If (Female)
-					UndressAnim = "0Eq0ER_F_ST_D_gloves_0"
-					AnimLen = 12
-					DressPoint = 3
+					UndressAnim = "redress_hands"
+					AnimLen = 2
+					DressPoint = 1.9
 				Else
-					UndressAnim = "0Eq0ER_M_ST_D_gloves_0"
-					AnimLen = 8
-					DressPoint = 6.5
+					UndressAnim = "redress_hands"
+					AnimLen = 2
+					DressPoint = 1.9
 				EndIf
 			EndIf
 
@@ -505,7 +530,7 @@ Event AnimatedRedressThread(String EventName, String StrArg, float NumArg, Form 
 				Utility.Wait(DressPoint)
 			EndIf
 			If (!Target.IsDead() && !OStim.IsActorActive(Target))
-				Target.EquipItem(items[i], false, true)
+				Target.EquipItemEx(items[i], equipSound = False)
 			EndIf
 			If (Loaded)
 				Utility.Wait(AnimLen - DressPoint)

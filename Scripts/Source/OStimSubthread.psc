@@ -266,13 +266,46 @@ function runOsexCommand(string cmd)
 EndFunction
 
 Function ScaleActors()
-	ostim.ScaleToHeight(domactor, ostim.DomScaleHeight)
+	ScaleToHeight(domactor, 1.03)
 	if subactor
-		ostim.ScaleToHeight(subactor, ostim.SubScaleHeight)
+		ScaleToHeight(subactor, 1)
 		if thirdactor
-			ostim.ScaleToHeight(thirdactor, ostim.ThirdScaleHeight)
+			ScaleToHeight(thirdactor, 1)
 		endif 
 	endif 
+EndFunction
+
+Function ScaleToHeight(Actor Act, Float GoalBodyScale)
+	Float NativeBodyScale = outils.GetOriginalScale(act)
+	Float Scale = ((GoalBodyScale - NativeBodyScale) / NativeBodyScale) + 1.0
+
+	;Console(act.GetDisplayName())
+	;Console("Native scale: " + NativeBodyScale)
+
+	If (Scale < 1.01)  && (Scale > 0.99) ; there is some floating point imprecision with the above.
+		if (math.abs(act.GetScale() - NativeBodyScale)) < 0.01 ; the actor is truly the same size as their original size
+			Console("Scale not needed")
+			Return ; no need to scale and update ninode
+		else 
+			; continue on, actor needs a scale reset
+			scale = 1.0
+		endif 
+	EndIf
+
+	Console("Setting scale: " + Scale)
+
+	If Scale < 0.01
+		Console("Error: an unknown mod is conflicting with OStim's scaling. OStim will now dump scaling data")
+		Console("Name: " + act.GetDisplayName())
+		Console("Target scale: " + GoalBodyScale)
+		Console("Current scale: " + Act.GetScale())
+		Console("Disabling scaling in the MCM will stop this message")
+		return 
+	EndIf
+
+	Act.SetScale(Scale)
+	Act.QueueNiNodeUpdate() ; This will cause actors to reqequip clothes if mid-scene
+	Act.SetScale(Scale)
 EndFunction
 
 Function SetAnimationSpeed(int to)

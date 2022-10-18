@@ -39,6 +39,32 @@ actor[] Function RemoveActorsWithGender(actor[] actors, int gender) Global Nativ
 
 form[] Function GetEquippedAmmo(actor act) Global Native
 
+Function UpdateForScene(string id, Actor[] actors, float[] offsets) Global Native
+
+Function ScaleActorInner(Actor act, float scale, float scaleHeight) Global
+	bool IsFemale = act.GetActorBase().GetSex() == 1
+
+	If nioverride.HasNodeTransformPosition(act, false, IsFemale, "NPC", "internal")
+		float offset = nioverride.GetNodeTransformPosition(act, false, IsFemale, "NPC", "internal")[2]
+		scale = scale * (scaleHeight / (scaleHeight + offset))
+	EndIf
+
+	act.SetScale(scale)
+EndFunction
+
+Function CheckOffset(Actor act, bool feetOnGround, float offset) Global
+	bool isFemale = act.GetActorBase().GetSex() == 1
+
+	If feetOnGround
+		OUtils.RestoreOffset(act, offset)
+	Else
+		If nioverride.HasNodeTransformPosition(act, false, isFemale, "NPC", "internal")
+			nioverride.RemoveNodeTransformPosition(act, false, isFemale, "NPC", "internal")
+			nioverride.UpdateNodeTransform(act, false, isFemale, "NPC")
+		EndIf
+	EndIf
+EndFunction
+
 
 ;  ██████╗ █████╗ ███╗   ███╗███████╗██████╗  █████╗
 ; ██╔════╝██╔══██╗████╗ ████║██╔════╝██╔══██╗██╔══██╗
@@ -66,17 +92,14 @@ Function SetFOV(Float Value, Bool FirstPerson = False) Global Native
 Float[] Function GetCameraPos() Global Native
 Function SetCameraPos(Float X, Float Y, Float Z) Global Native
 
-
-; ██████╗  █████╗ ████████╗ █████╗ ██████╗  █████╗ ███████╗███████╗
-; ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝
-; ██║  ██║███████║   ██║   ███████║██████╔╝███████║███████╗█████╗
-; ██║  ██║██╔══██║   ██║   ██╔══██║██╔══██╗██╔══██║╚════██║██╔══╝
-; ██████╔╝██║  ██║   ██║   ██║  ██║██████╔╝██║  ██║███████║███████╗
-; ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
-
-
-; Build the json database
-Function BuildDB() Global Native
+;  ██████╗ ██████╗ ███╗   ██╗████████╗██████╗  ██████╗ ██╗     ███████╗
+; ██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██╔═══██╗██║     ██╔════╝
+; ██║     ██║   ██║██╔██╗ ██║   ██║   ██████╔╝██║   ██║██║     ███████╗
+; ██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██╗██║   ██║██║     ╚════██║
+; ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║╚██████╔╝███████╗███████║
+;  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝
+                                                                     
+Function Control(Int direction, Int glyph) Global Native
 
 
 ; ███████╗ █████╗  ██████╗███████╗
