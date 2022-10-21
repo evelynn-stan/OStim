@@ -558,6 +558,9 @@ Event OnUpdate() ;OStim main logic loop
 
 
 	Actor[] Actro
+
+	
+
 	If (ThirdActor)
 		Actro = New Actor[3]
 		Actro[2] = ThirdActor
@@ -568,6 +571,8 @@ Event OnUpdate() ;OStim main logic loop
 	Else
 		Actro = new Actor[1]
 	EndIf
+
+	Actro[0] = DomActor
 
 	RegisterForModEvent("ostim_setvehicle", "OnSetVehicle")
 	
@@ -591,10 +596,6 @@ Event OnUpdate() ;OStim main logic loop
 			RegisterForModEvent("0SAA" + ThirdFormID + "_BlendEx", "OnExThird")
 		EndIf
 	EndIf
-
-	
-
-	Actro[0] = DomActor
 
 	If (!UsingBed && UseBed)
 		Currentbed = FindBed(DomActor)
@@ -659,6 +660,7 @@ Event OnUpdate() ;OStim main logic loop
 		diasa = o + ".viewStage"
 	endif
 
+	
 
 	if !ThirdActor
 		CurrentAnimation = "0Sx0MF_Ho-St6RevCud+01T180"
@@ -689,6 +691,7 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	Password = DomActor.GetFactionRank(OsaFactionStage)
+	OSANative.StartScene(Password, Actro)
 	string EventName = "0SAO" + Password + "_AnimateStage"
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
@@ -925,7 +928,7 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	SceneRunning = False
-
+	OSANative.EndScene(Password)
 	SendModEvent("ostim_totalend")
 
 EndEvent
@@ -1999,6 +2002,8 @@ Function OnAnimationChange()
 		sceneChange = true 
 	endif 
 	CurrentSceneID = newScene
+		
+	OSANative.ChangeAnimation(Password, CurrentSceneID)
 	;Profile("DB Lookup")
 
 	If (ODatabase.IsHubAnimation(CurrentOID))
@@ -2040,6 +2045,7 @@ Function OnAnimationChange()
 
 			If (Act != DomActor) && (Act != SubActor) && (IsActorActive(Act))
 				ThirdActor = Act
+				OSANative.AddThirdActor(Password, ThirdActor)
 				; Disable Precision mod collisions for the third actor to prevent misalignments and teleports to (0,0) cell
 				TogglePrecisionForActor(ThirdActor, false)
 				i = max
@@ -2091,6 +2097,7 @@ Function OnAnimationChange()
 		TogglePrecisionForActor(ThirdActor, true)
 
 		ThirdActor = none
+		OSANative.RemoveThirdActor(Password)
 
 		SendModEvent("ostim_thirdactor_leave") ; careful, getthirdactor() won't work in this event
 	EndIf
