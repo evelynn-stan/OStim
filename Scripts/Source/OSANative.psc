@@ -172,6 +172,23 @@ ObjectReference	Function GetLocationMarker(location loc) Global Native
 
 form[] Function RemoveFormsBelowValue(form[] forms, int goldvalue) Global Native
 
+; ███████╗ ██████╗███████╗███╗   ██╗███████╗    ████████╗██████╗  █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ ██████╗ 
+; ██╔════╝██╔════╝██╔════╝████╗  ██║██╔════╝    ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██║████╗  ██║██╔════╝ 
+; ███████╗██║     █████╗  ██╔██╗ ██║█████╗         ██║   ██████╔╝███████║██║     █████╔╝ ██║██╔██╗ ██║██║  ███╗
+; ╚════██║██║     ██╔══╝  ██║╚██╗██║██╔══╝         ██║   ██╔══██╗██╔══██║██║     ██╔═██╗ ██║██║╚██╗██║██║   ██║
+; ███████║╚██████╗███████╗██║ ╚████║███████╗       ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗██║██║ ╚████║╚██████╔╝
+; ╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚══════╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+
+Function StartScene(int stageId, Actor[] actors) Global Native
+
+Function EndScene(int stageId) Global Native
+
+Function ChangeAnimation(int stageId, string animation) Global Native
+
+Function AddThirdActor(int stageId, Actor actor) Global Native
+
+Function RemoveThirdActor(int stageId) Global Native
+
 ; ██╗   ██╗████████╗██╗██╗
 ; ██║   ██║╚══██╔══╝██║██║
 ; ██║   ██║   ██║   ██║██║

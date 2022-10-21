@@ -636,7 +636,6 @@ Event OnUpdate() ;OStim main logic loop
 		diasa = o + ".viewStage"
 	endif
 
-
 	if !ThirdActor
 		CurrentAnimation = "0MF|Sy6!Sy9|Ho|St9Adore"
 	elseIf SubActor
@@ -666,6 +665,7 @@ Event OnUpdate() ;OStim main logic loop
 	EndIf
 
 	Password = DomActor.GetFactionRank(OsaFactionStage)
+	OSANative.StartScene(Password, Actors)
 	string EventName = "0SAO" + Password + "_AnimateStage"
 	RegisterForModEvent(eventName, "OnAnimate")
 	RegisterForModEvent("0SAO" + Password + "_ActraSync", "SyncActors")
@@ -893,7 +893,7 @@ Event OnUpdate() ;OStim main logic loop
 	scenemetadata = PapyrusUtil.StringArray(0)
 
 	SceneRunning = False
-
+	OSANative.EndScene(Password)
 	SendModEvent("ostim_totalend")
 
 EndEvent
@@ -1947,6 +1947,8 @@ Function OnAnimationChange()
 		sceneChange = true 
 	endif 
 	CurrentSceneID = newScene
+		
+	OSANative.ChangeAnimation(Password, CurrentSceneID)
 	;Profile("DB Lookup")
 
 	If (ODatabase.IsHubAnimation(CurrentOID))
@@ -1988,6 +1990,7 @@ Function OnAnimationChange()
 
 			If Actors.Find(Act) == -1 && (IsActorActive(Act))
 				ThirdActor = Act
+				OSANative.AddThirdActor(Password, ThirdActor)
 				; Disable Precision mod collisions for the third actor to prevent misalignments and teleports to (0,0) cell
 				TogglePrecisionForActor(ThirdActor, false)
 				i = max
@@ -2039,6 +2042,7 @@ Function OnAnimationChange()
 		TogglePrecisionForActor(ThirdActor, true)
 
 		ThirdActor = none
+		OSANative.RemoveThirdActor(Password)
 
 		SendModEvent("ostim_thirdactor_leave") ; careful, getthirdactor() won't work in this event
 	EndIf
