@@ -27,6 +27,8 @@ Int Property osaEndKey = 83 auto ; numpad .
 
 Bool property disableControl auto
 
+Actor[] property ActraInRange auto
+
 Armor[] InspectArmor
 Int[] InspectArmorWorn
 
@@ -401,45 +403,31 @@ Event OnTargeting(String EventName, String Query, Float NumArg, Form Sender)
         ; Potentially a spell cloak could be used but that sounds like it might be even more expensive.
 
         Actor ActraFound
-        Actor[] ActraFoundArr = new Actor[25]
+        ActraInRange = PapyrusUtil.ActorArray(30)
 
         Int i = 0
-        Int ScanAmount = 25
+        Int ScanAmount = 30
         Int FoundCount = 0
+
         While (i < ScanAmount)
             ActraFound = Game.FindRandomActorFromRef(PlayerRef, 5000.0)
-            If (ActraFoundArr.Find(ActraFound) == -1)
-                ;PapyrusUtil.PushActor(actraInRange, actorFound)
-                ActraFoundArr[i] = ActraFound
+
+            If (ActraFound && !ActraFound.isChild() && ActraFound.HasKeywordString("ActorTypeNPC") && ActraInRange.Find(ActraFound) == -1)
+                ActraInRange[FoundCount] = ActraFound
                 FoundCount += 1
             EndIf
             i += 1
         endWhile
-
-        Actor[] ActraInRange = PapyrusUtil.ActorArray(FoundCount)
-
-        i = 0
-        Int FoundCountAdded = 0
-        While (i < ScanAmount)
-            If (ActraFoundArr[i])
-                ActraInRange[FoundCountAdded] = ActraFoundArr[i]
-                FoundCountAdded += 1
-            EndIf
-            i += 1
-        EndWhile
 
         ; END OF SHITTY BAND-AID
 
         Debug.Notification("Scan Done")
 
         i = 0
-        Int L = ActraInRange.Length
-        While i < L
-            If (ActraInRange[i].HasKeywordString("ActorTypeNPC"))
-                IDs = GetFormID_S(ActraInRange[i].GetActorBase())
-                OSO.ProcessActraDetails(ActraInRange[i], IDs)
-                UI.InvokeString("HUD Menu", "_root.WidgetContainer." + Glyph + ".widget.targ.addTarg", IDs)
-            EndIf
+        While i < FoundCount
+            IDs = GetFormID_S(ActraInRange[i].GetActorBase())
+            OSO.ProcessActraDetails(ActraInRange[i], IDs)
+            UI.InvokeString("HUD Menu", "_root.WidgetContainer." + Glyph + ".widget.targ.addTarg", IDs)
             i += 1
         EndWhile
 
