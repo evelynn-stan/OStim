@@ -1,0 +1,20 @@
+{
+	"female":{
+		"expression":{
+			"type":2,
+			"baseValue":50
+		},
+		"phonemes":[
+			{
+				"type":5,
+				"stimulationMultiplier":0.5
+			}
+		]
+	},
+	"male":{
+		"expression":{
+			"type":2,
+			"baseValue":50
+		}
+	}
+}

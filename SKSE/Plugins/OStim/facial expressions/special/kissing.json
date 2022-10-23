@@ -1,0 +1,16 @@
+{
+	"female":{
+		"phonemes":{
+			"15":{
+				"baseValue":100
+			}
+		}
+	},
+	"male":{
+		"phonemes":{
+			"15":{
+				"baseValue":100
+			}
+		}
+	}
+}

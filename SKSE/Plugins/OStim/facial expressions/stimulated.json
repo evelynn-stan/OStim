@@ -1,0 +1,34 @@
+{
+	"actionTargets":[
+		"analfingering",
+		"blowjob",
+		"clitorisrubbing",
+		"cunnilingus",
+		"femalemasturbation",
+		"footjob",
+		"gropingbreast",
+		"handjob",
+		"malemasturbation",
+		"nipplesucking",
+		"vaginalfingering"
+	],
+	"female":{
+		"expression":{
+			"type":2,
+			"baseValue":70
+		},
+		"phonemes":[
+			{
+				"type":5,
+				"baseValue":35,
+				"stimulationMultiplier":0.4
+			}
+		]
+	},
+	"male":{
+		"expression":{
+			"type":2,
+			"baseValue":70
+		}
+	}
+}

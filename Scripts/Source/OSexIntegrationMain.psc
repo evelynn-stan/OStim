@@ -29,6 +29,12 @@ ScriptName OSexIntegrationMain Extends Quest
 ;			 ╚═════╝ ╚══════╝   ╚═╝   ╚═╝╚═╝     ╚═╝
 
 
+; -------------------------------------------------------------------------------------------------
+; PROPERTIES  -------------------------------------------------------------------------------------
+
+
+Faction Property OstimNoFacialExpressionsFaction Auto
+
 
 ; -------------------------------------------------------------------------------------------------
 ; SETTINGS  ---------------------------------------------------------------------------------------
@@ -2476,6 +2482,7 @@ Bool BlockSubFaceCommands
 Bool BlockThirdFaceCommands
 
 Function MuteFaceData(Actor Act)
+	Act.AddToFaction(OstimNoFacialExpressionsFaction)
 	If (Act == DomActor)
 		BlockDomFaceCommands = True
 	Elseif (Act == SubActor)
@@ -2486,6 +2493,7 @@ Function MuteFaceData(Actor Act)
 EndFunction
 
 Function UnMuteFaceData(Actor Act)
+	Act.RemoveFromFaction(OstimNoFacialExpressionsFaction)
 	If (Act == DomActor)
 		BlockDomFaceCommands = False
 	Elseif (Act == SubActor)
@@ -2496,13 +2504,7 @@ Function UnMuteFaceData(Actor Act)
 EndFunction
 
 Bool Function FaceDataIsMuted(Actor Act)
-	If (Act == DomActor)
-		Return BlockDomFaceCommands
-	Elseif (Act == SubActor)
-		Return BlocksubFaceCommands
-	Elseif (Act == ThirdActor)
-		Return BlockthirdFaceCommands
-	EndIf
+	Return Act.IsInFaction(OstimNoFacialExpressionsFaction)
 EndFunction
 
 Event OnMoDom(String EventName, String zType, Float zAmount, Form Sender)
@@ -2580,6 +2582,7 @@ EndEvent
 
 Function OnEx(Actor Act, Int zType, Int zAmount) ;expression related face blending
 	;Console("Expression event: " + "Type: " + type + " Amount: " + amount)
+	MfgConsoleFunc.SetPhonemeModifier(Act, 2, zType, zAmount)
 	Act.SetExpressionOverride(zType, zAmount)
 EndFunction
 
@@ -3531,11 +3534,6 @@ Function Startup()
 
 	OControl.ResetControls()
 	OControl.UpdateControls() ; uneeded?
-
-	;If (SKSE.GetPluginVersion("ImprovedCamera") == -1)
-		;Debug.Notification("OStim: Improved Camera is not installed. First person scenes unavailable.")
-		;Debug.Notification("OStim: However, freecam will have extra features.")
-	;EndIf
 
 	If (!_oGlobal.OStimGlobalLoaded())
 		Debug.MessageBox("It appears you have the OSex facial expression fix installed. Please exit and remove that mod, as it is now included in OStim, and having it installed will break some things now!")
