@@ -41,6 +41,8 @@ form[] Function GetEquippedAmmo(actor act) Global Native
 
 Function UpdateForScene(string id, Actor[] actors, float[] offsets) Global Native
 
+Function UpdateExpression(string id, int position, Actor act) Global Native
+
 Function ScaleActorInner(Actor act, float scale, float scaleHeight) Global
 	bool IsFemale = act.GetActorBase().GetSex() == 1
 

@@ -21,7 +21,7 @@
 			{
 				"type":5,
 				"baseValue":35,
-				"stimulationMultiplier":0.4
+				"excitementMultiplier":0.4
 			}
 		]
 	},

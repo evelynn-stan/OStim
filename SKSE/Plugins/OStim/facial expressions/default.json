@@ -1,4 +1,7 @@
 {
+	"events":[
+		"default"
+	],
 	"female":{
 		"expression":{
 			"type":2,
@@ -7,7 +10,7 @@
 		"phonemes":[
 			{
 				"type":5,
-				"stimulationMultiplier":0.5
+				"excitementMultiplier":0.5
 			}
 		]
 	},

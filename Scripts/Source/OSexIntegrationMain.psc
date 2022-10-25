@@ -33,7 +33,8 @@ ScriptName OSexIntegrationMain Extends Quest
 ; PROPERTIES  -------------------------------------------------------------------------------------
 
 
-Faction Property OstimNoFacialExpressionsFaction Auto
+Faction Property OStimNoFacialExpressionsFaction Auto
+Faction Property OStimExcitementFaction Auto
 
 
 ; -------------------------------------------------------------------------------------------------
@@ -477,6 +478,8 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		Else
 			Offsets[i] = 0
 		EndIf
+
+		Actors[i].AddToFaction(OStimExcitementFaction)
 	EndWhile
 
 	If (Aggressive)
@@ -585,21 +588,12 @@ Event OnUpdate() ;OStim main logic loop
 
 	String DomFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(DomActor))
 	RegisterForModEvent("0SSO" + DomFormID + "_Sound", "OnSoundDom")
-	RegisterForModEvent("0SAA" + DomFormID + "_BlendMo", "OnMoDom")
-	RegisterForModEvent("0SAA" + DomFormID + "_BlendPh", "OnPhDom")
-	RegisterForModEvent("0SAA" + DomFormID + "_BlendEx", "OnExDom")
 	If (SubActor)
 		String SubFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(SubActor))
 		RegisterForModEvent("0SSO" + SubFormID + "_Sound", "OnSoundSub")
-		RegisterForModEvent("0SAA" + SubFormID + "_BlendMo", "OnMoSub")
-		RegisterForModEvent("0SAA" + SubFormID + "_BlendPh", "OnPhSub")
-		RegisterForModEvent("0SAA" + SubFormID + "_BlendEx", "OnExSub")
 		If (ThirdActor)
 			String ThirdFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(ThirdActor)) 
 			RegisterForModEvent("0SSO" + ThirdFormID + "_Sound", "OnSoundThird")
-			RegisterForModEvent("0SAA" + ThirdFormID + "_BlendMo", "OnMoThird")
-			RegisterForModEvent("0SAA" + ThirdFormID + "_BlendPh", "OnPhThird")
-			RegisterForModEvent("0SAA" + ThirdFormID + "_BlendEx", "OnExThird")
 		EndIf
 	EndIf
 
@@ -783,9 +777,11 @@ Event OnUpdate() ;OStim main logic loop
 			DomExcitement += GetCurrentStimulation(DomActor) * DomStimMult
 			If SubActor
 				SubExcitement += GetCurrentStimulation(SubActor) * SubStimMult
+				SubActor.SetFactionRank(OStimExcitementFaction, SubExcitement as int)
 			EndIf
 			If ThirdActor
 				ThirdExcitement += GetCurrentStimulation(ThirdActor) * ThirdStimMult
+				ThirdActor.SetFactioNRank(OStimExcitementFaction, ThirdExcitement as int)
 			EndIf
 		EndIf
 		;Profile("Stim calculation")
@@ -807,6 +803,8 @@ Event OnUpdate() ;OStim main logic loop
 				EndIf
 			EndIf
 		EndIf
+				
+		DomActor.SetFactionRank(OStimExcitementFaction, DomExcitement as int)
 
 		If (ThirdExcitement >= 100.0)
 			MostRecentOrgasmedActor = ThirdActor
@@ -844,6 +842,8 @@ Event OnUpdate() ;OStim main logic loop
 		If Offsets[i] != 0
 			OUtils.RestoreOffset(Actors[i], Offsets[i])
 		EndIf
+
+		Actors[i].RemoveFromFaction(OStimExcitementFaction)
 	EndWhile
 
 	SendModEvent("ostim_end", numArg = -1.0)
@@ -890,21 +890,12 @@ Event OnUpdate() ;OStim main logic loop
 
 
 	UnRegisterForModEvent("0SSO" + DomFormID + "_Sound")
-	UnRegisterForModEvent("0SAA" + DomFormID + "_BlendMo")
-	UnRegisterForModEvent("0SAA" + DomFormID + "_BlendPh")
-	UnRegisterForModEvent("0SAA" + DomFormID + "_BlendEx")
 	If (SubActor)
 		String SubFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(SubActor))
 		UnRegisterForModEvent("0SSO" + SubFormID + "_Sound")
-		UnRegisterForModEvent("0SAA" + SubFormID + "_BlendMo")
-		UnRegisterForModEvent("0SAA" + SubFormID + "_BlendPh")
-		UnRegisterForModEvent("0SAA" + SubFormID + "_BlendEx")
 		If (ThirdActor)
 			String ThirdFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(ThirdActor)) 
 			UnRegisterForModEvent("0SSO" + ThirdFormID + "_Sound")
-			UnRegisterForModEvent("0SAA" + ThirdFormID + "_BlendMo")
-			UnRegisterForModEvent("0SAA" + ThirdFormID + "_BlendPh")
-			UnRegisterForModEvent("0SAA" + ThirdFormID + "_BlendEx")
 		EndIf
 	EndIf
 
@@ -2076,6 +2067,8 @@ Function OnAnimationChange()
 				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
 			EndIf
 
+			ThirdActor.AddToFaction(OStimExcitementFaction)
+
 			SendModEvent("ostim_thirdactor_join")
 		Else
 			Console("Warning - Third Actor not found")
@@ -2095,6 +2088,8 @@ Function OnAnimationChange()
 			OUtils.RestoreOffset(Actors[2], Offsets[2])
 		EndIf
 
+		ThirdActor.RemoveFromFaction(OStimExcitementFaction)
+
 		Offsets = PapyrusUtil.ResizeFloatArray(Offsets, 2)
 
 		ThirdActor.SetScale(1.0)
@@ -2107,8 +2102,6 @@ Function OnAnimationChange()
 
 		SendModEvent("ostim_thirdactor_leave") ; careful, getthirdactor() won't work in this event
 	EndIf
-
-	int i = Actors.Length
 
 	Rescale()
 
@@ -2427,6 +2420,8 @@ Function SetActorExcitement(Actor Act, Float Value)
 	Else
 		Console("Unknown Actor")
 	EndIf
+
+	Act.SetFactionRank(OStimExcitementFaction, Value as int)
 EndFunction
 
 Function Orgasm(Actor Act)
@@ -2500,6 +2495,11 @@ Function UnMuteFaceData(Actor Act)
 		BlocksubFaceCommands = False
 	Elseif (Act == ThirdActor)
 		BlockthirdFaceCommands = False
+	EndIf
+
+	int i = Actors.Find(Act)
+	If i != -1
+		OSANative.UpdateExpression(CurrentAnimation, i, Act)
 	EndIf
 EndFunction
 

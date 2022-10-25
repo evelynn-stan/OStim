@@ -12,7 +12,7 @@
 			{
 				"type":11,
 				"baseValue":50,
-				"stimulationMultiplier":0.25
+				"excitementMultiplier":0.25
 			}
 		],
 		"modifiers":[
@@ -36,7 +36,7 @@
 			{
 				"type":11,
 				"baseValue":50,
-				"stimulationMultiplier":0.25
+				"excitementMultiplier":0.25
 			}
 		]
 	}

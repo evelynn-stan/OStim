@@ -14,27 +14,27 @@
 			{
 				"type":1,
 				"baseValue":10,
-				"stimulationMultiplier":0.1
+				"excitementMultiplier":0.1
 			},
 			{
 				"type":11,
 				"baseValue":20,
-				"stimulationMultiplier":0.2
+				"excitementMultiplier":0.2
 			}
 		],
 		"modifiers":[
 			{
 				"type":0,
-				"stimulationMultiplier":0.2
+				"excitementMultiplier":0.2
 			},
 			{
 				"type":1,
-				"stimulationMultiplier":0.2
+				"excitementMultiplier":0.2
 			},
 			{
 				"type":11,
 				"baseValue":10,
-				"stimulationMultiplier":0.4
+				"excitementMultiplier":0.4
 			}
 		]
 	},
@@ -47,12 +47,12 @@
 			{
 				"type":1,
 				"baseValue":10,
-				"stimulationMultiplier":0.1
+				"excitementMultiplier":0.1
 			},
 			{
 				"type":11,
 				"baseValue":20,
-				"stimulationMultiplier":0.2
+				"excitementMultiplier":0.2
 			}
 		]
 	}
