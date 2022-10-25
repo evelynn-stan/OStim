@@ -2036,14 +2036,13 @@ Function OnAnimationChange()
 	If (!ThirdActor && (CorrectActorCount == 3)) ; no third actor, but there should be
 		Console("Third actor has joined scene ")
 
-		Actor[] NearbyActors = MiscUtil.ScanCellNPCs(DomActor, Radius = 64.0) ;epic hackjob time
-		int max = NearbyActors.Length
+		int max = OControl.ActraInRange.Length
 		int i = 0
 
 		While (i < max)
-			Actor Act = NearbyActors[i]
+			Actor Act = OControl.ActraInRange[i]
 
-			If (Act != DomActor) && (Act != SubActor) && (IsActorActive(Act))
+			If (Act) && (Act != DomActor) && (Act != SubActor) && (IsActorActive(Act))
 				ThirdActor = Act
 				OSANative.AddThirdActor(Password, ThirdActor)
 				; Disable Precision mod collisions for the third actor to prevent misalignments and teleports to (0,0) cell
