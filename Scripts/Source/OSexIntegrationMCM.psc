@@ -160,18 +160,6 @@ string ONights = "ONights.esp"
 int GVONFreqMult = 0x000D65
 int GVONStopWhenFound = 0x000D64
 
-string OBody = "OBody.esp"
-int GVOBorefit = 0x001802
-int GVOBNippleRand = 0x001803
-int GVOBGenitalRand = 0x001804
-int GVOBPrestKey = 0x001805
-
-
-int SetOBRefit
-int SetOBNippleRand
-int SetOBGenitalRand
-int SetOBPresetKey
-
 int SetONStopWhenFound
 int SetONFreqMult
 
@@ -456,15 +444,6 @@ Event OnPageReset(String Page)
 
 		SetCursorPosition(3)
 
-		if main.IsModLoaded(OBody)
-			AddColoredHeader("OBody")
-			SetOBRefit = AddToggleOption("$ostim_addon_ob_refit", GetExternalBool(OBody, GVOBorefit))
-			SetOBNippleRand = AddToggleOption("$ostim_addon_ob_nipples", GetExternalBool(OBody, GVOBNippleRand))
-			SetOBGenitalRand = AddToggleOption("$ostim_addon_ob_genitals", GetExternalBool(OBody, GVOBGenitalRand))
-			SetOBPresetKey = AddKeyMapOption("$ostim_addon_ob_preset_key", GetExternalInt(OBody, GVOBPrestKey))
-			
-		endif 
-
 		if main.IsModLoaded(OCrime)
 			AddColoredHeader("OCrime")
 			SetOCBounty = AddSliderOption("$ostim_addon_oc_bounty", StorageUtil.GetIntValue(none, suocbounty), "{0} Gold")
@@ -568,15 +547,6 @@ Event OnOptionSelect(Int Option)
 		elseif option == SetONStopWhenFound
 			SetExternalBool(ONights, GVONStopWhenFound, !GetExternalBool(ONights, GVONStopWhenFound))
 			SetToggleOptionValue(SetONStopWhenFound, GetExternalBool(ONights, GVONStopWhenFound))
-		elseif option == SetOBRefit
-			SetExternalBool(OBody, GVOBorefit, !GetExternalBool(OBody, GVOBorefit))
-			SetToggleOptionValue(SetOBRefit, GetExternalBool(OBody, GVOBorefit))
-		elseif option == SetOBNippleRand
-			SetExternalBool(OBody, GVOBNippleRand, !GetExternalBool(OBody, GVOBNippleRand))
-			SetToggleOptionValue(SetOBNippleRand, GetExternalBool(OBody, GVOBNippleRand))
-		elseif option == SetOBGenitalRand
-			SetExternalBool(OBody, GVOBGenitalRand, !GetExternalBool(OBody, GVOBGenitalRand))
-			SetToggleOptionValue(SetOBGenitalRand, GetExternalBool(OBody, GVOBGenitalRand))
 		elseif option == SetOSAllowSex
 			StorageUtil.SetIntValue(none, SUOSAllowSex, (!(StorageUtil.GetIntValue(none, SUOSAllowSex) as bool)) as int)
 			SetToggleOptionValue(SetOSAllowSex, StorageUtil.GetIntValue(none, SUOSAllowSex))
@@ -765,8 +735,6 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_oa_key")
 		elseif (option == SetOSKey)
 			SetInfoText("$ostim_tooltip_os_key")
-		elseif (option == SetOBPresetKey)
-			SetInfoText("$ostim_tooltip_ob_preset_key")
 		elseif (option == SetORSexuality)
 			SetInfoText("$ostim_tooltip_or_sexuality")
 		elseif (option == SetORColorblind)
@@ -787,12 +755,6 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_op_freq")
 		Elseif (Option == SetONStopWhenFound)
 			SetInfoText("$ostim_tooltip_on_stop")
-		Elseif (Option == SetOBRefit)
-			SetInfoText("$ostim_tooltip_ob_refit")
-		Elseif (Option == SetOBNippleRand)
-			SetInfoText("$ostim_tooltip_ob_nipple")
-		Elseif (Option == SetOBGenitalRand)
-			SetInfoText("$ostim_tooltip_ob_genitals")
 		Elseif (Option == SetOARequireLowArousalBeforeEnd)
 			SetInfoText("$ostim_tooltip_oa_low_arousal_end")
 		Elseif (Option == SetOSAllowHub)
@@ -1133,9 +1095,6 @@ Event OnOptionKeyMapChange(Int Option, Int KeyCode, String ConflictControl, Stri
 	Elseif (Option == SetORKey)
 		SetExternalInt(oromance, gvorkey, KeyCode)
 		SetKeyMapOptionValue(Option, KeyCode)
-	Elseif (Option == SetOBPresetKey)
-		SetExternalInt(OBody, GVOBPrestKey, KeyCode)
-		SetKeyMapOptionValue(Option, KeyCode)
 	Elseif (Option == SetORLeft)
 		SetExternalInt(oromance, GVORLeft, KeyCode)
 		SetKeyMapOptionValue(Option, KeyCode)
@@ -1421,17 +1380,6 @@ Function ExportSettings()
 		JMap.setInt(OstimSettingsFile, "savedoVirginity", 0)
 	endif
 
-	if main.IsModLoaded(OBody)
-		osexintegrationmain.Console("Saving OBody settings.")
-		JMap.setInt(OstimSettingsFile, "savedOBody", 1)
-		JMap.setInt(OstimSettingsFile, "SetOBRefit", GetExternalBool(OBody, GVOBorefit) as Int)
-		JMap.setInt(OstimSettingsFile, "SetOBNippleRand", GetExternalBool(OBody, GVOBNippleRand) as Int)
-		JMap.setInt(OstimSettingsFile, "SetOBGenitalRand", GetExternalBool(OBody, GVOBGenitalRand) as Int)
-		JMap.setInt(OstimSettingsFile, "SetOBPresetKey", GetExternalInt(OBody, GVOBPrestKey) as Int)
-	Else
-		JMap.setInt(OstimSettingsFile, "savedOBody", 0)
-	endif
-
 	if main.IsModLoaded(OCrime)
 		osexintegrationmain.Console("Saving OCrime settings.")
 		JMap.setInt(OstimSettingsFile, "savedOCrime", 1)
@@ -1631,14 +1579,6 @@ Function ImportSettings(bool default = false)
 			osexintegrationmain.Console("Loading oVirginity settings.")
 			StorageUtil.SetIntValue(none, SUOVShowEffects, JMap.GetInt(OstimSettingsFile, "SetOVShowEffects"))
 			StorageUtil.SetIntValue(none, SUOVVirginChance, JMap.GetInt(OstimSettingsFile, "SetOVVirginChance"))
-		endif
-
-		if main.IsModLoaded(OBody) && JMap.getInt(OstimSettingsFile, "savedOBody") == 1
-			osexintegrationmain.Console("Loading OBody settings.")
-			SetExternalBool(OBody, GVOBorefit, JMap.getInt(OstimSettingsFile, "SetOBRefit") as bool)
-			SetExternalBool(OBody, GVOBNippleRand, JMap.getInt(OstimSettingsFile, "SetOBNippleRand") as bool)
-			SetExternalBool(OBody, GVOBGenitalRand, JMap.getInt(OstimSettingsFile, "SetOBGenitalRand") as bool)
-			SetExternalInt(OBody, GVOBPrestKey, JMap.getInt(OstimSettingsFile, "SetOBPresetKey"))
 		endif
 
 		if main.IsModLoaded(OCrime) && JMap.getInt(OstimSettingsFile, "savedOCrime") == 1
