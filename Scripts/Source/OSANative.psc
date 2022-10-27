@@ -43,6 +43,8 @@ Function UpdateForScene(string id, Actor[] actors, float[] offsets) Global Nativ
 
 Function UpdateExpression(string id, int position, Actor act) Global Native
 
+float Function PlayExpressionEvent(string id, int position, Actor act, string eventName) Global Native
+
 Function ScaleActorInner(Actor act, float scale, float scaleHeight) Global
 	bool IsFemale = act.GetActorBase().GetSex() == 1
 

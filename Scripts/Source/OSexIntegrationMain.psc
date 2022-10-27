@@ -584,6 +584,10 @@ Event OnUpdate() ;OStim main logic loop
 	Actro[0] = DomActor
 
 	RegisterForModEvent("ostim_setvehicle", "OnSetVehicle")
+	; OBarsScript already registers for the ostim_orgasm event and is attacked to the same quest
+	; so this registration will not work, but renaming the listener to OstimOrgasm will, as that is what OBarsScript registered it to
+	; if we ever split the scripts up on different quests we have to register for the event here again
+	;RegisterForModEvent("ostim_orgasm", "OnOrgasm")
 	
 
 	String DomFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(DomActor))
@@ -2055,9 +2059,6 @@ Function OnAnimationChange()
 
 			ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
 			RegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound", "OnSoundThird")
-			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendMo", "OnMoThird")
-			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendPh", "OnPhThird")
-			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx", "OnExThird")
 
 			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
 
@@ -2078,9 +2079,6 @@ Function OnAnimationChange()
 
 		ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
 		UnRegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound")
-		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendMo")
-		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendPh")
-		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx")
 
 		Actors = PapyrusUtil.ResizeActorArray(Actors, 2)
 
@@ -2426,7 +2424,7 @@ EndFunction
 
 Function Orgasm(Actor Act)
 	SetActorExcitement(Act, -3.0)
-	SendModEvent("ostim_orgasm")
+	Act.SendModEvent("ostim_orgasm")
 	If (Act == PlayerRef)
 		NutEffect.Apply()
 		If (SlowMoOnOrgasm)
@@ -2461,6 +2459,18 @@ Function Orgasm(Actor Act)
 
 	Act.DamageActorValue("stamina", 250.0)
 EndFunction
+
+Event OstimOrgasm(String EventName, String Args, Float Nothing, Form Sender)
+	Actor Act = Sender As Actor
+	If !FaceDataIsMuted(Act)
+		; if we don't mute FaceData here OSAs constant sound spamming will override the climax face after 1-2 seconds
+		MuteFaceData(Act)
+		; SendExpressionEvent will not automatically reset the face back to default because FaceData is muted...
+		SendExpressionEvent(Act, "climax")
+		; ...but unmuting FaceData will reset it, so we're good
+		UnMuteFaceData(Act)
+	EndIf
+EndEvent
 
 Function SetOrgasmStall(Bool Set)
 	StallOrgasm = Set
@@ -2656,16 +2666,24 @@ Function OnSound(Actor Act, Int SoundID, Int FormNumber)
 		EndIf
 	EndIf
 
+	bool PlayExpression = False
 	If (!MuteOSA) || IntArrayContainsValue(SoundFormNumberWhitelist, FormID)
 		PlayOSASound(Act, Formid, Soundid)
+		If FormNumber != 20
+			PlayExpression = True
+		EndIf
 	EndIf
 
+	String EventName = "moan"
 	If (FormNumber == 60)
 		OnSpank()
 		ShakeController(0.3)
 		If (UseScreenShake && ((DomActor == PlayerRef) || (SubActor == PlayerRef)))
 			ShakeCamera(0.5)
 		EndIf
+
+		PlayExpression = True
+		EventName = "spank"
 	EndIf
 
 	If (FormNumber == 50)
@@ -2685,8 +2703,27 @@ Function OnSound(Actor Act, Int SoundID, Int FormNumber)
 	Arg += "," + FormId
 	Arg += "," + SoundId
 	SendModEvent("ostim_osasound", StrArg = Arg)
+	
+	If PlayExpression && !FaceDataIsMuted(Act)
+		SendExpressionEvent(Act, EventName)
+	EndIf
+EndFunction
 
-	;Console("Sound: " + arg)
+;/* SendExpressionEvent
+* * plays the event expression and if it is valid resets the expression when it's over
+* * contains a Utility::Wait call, so best only call this from event listeners
+*/;
+Function SendExpressionEvent(Actor Act, string EventName)
+	int Position = Actors.find(Act)
+	If Position == -1
+		Return
+	EndIf
+
+	float Duration = OSANative.PlayExpressionEvent(CurrentSceneID, Position, Act, EventName)
+	If Duration != -1
+		Utility.Wait(Duration)
+		OSANative.UpdateExpression(CurrentSceneID, Position, Act)
+	EndIf
 EndFunction
 
 Event OnFormBind(String EventName, String zMod, Float IxID, Form Sender)
