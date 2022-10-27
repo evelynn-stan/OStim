@@ -167,6 +167,20 @@ Bool Property Installed auto
 
 Int[] Property StrippingSlots Auto
 
+GlobalVariable Property OStimDisableScaling Auto
+bool Property DisableScaling
+	bool Function Get()
+		Return OStimDisableScaling.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimDisableScaling.value = 1
+		Else
+			OStimDisableScaling.value = 0
+		EndIf
+	EndFunction
+EndProperty
+
 int Property InstalledVersion Auto
 
 bool property ShowTutorials auto
@@ -852,7 +866,7 @@ Event OnUpdate() ;OStim main logic loop
 
 	SendModEvent("ostim_end", numArg = -1.0)
 
-	If !ForceCloseOStimThread
+	If !ForceCloseOStimThread && !DisableScaling
 		RestoreScales()
 	EndIf
 
@@ -2090,7 +2104,9 @@ Function OnAnimationChange()
 
 		Offsets = PapyrusUtil.ResizeFloatArray(Offsets, 2)
 
-		ThirdActor.SetScale(1.0)
+		If !DisableScaling
+			ThirdActor.SetScale(1.0)
+		EndIf
 
 		; Enable Precision mod collisions again for the actor that is leaving
 		TogglePrecisionForActor(ThirdActor, true)
