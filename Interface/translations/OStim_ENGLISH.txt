@@ -1,0 +1,313 @@
+;== dropdowns ==
+$ostim_light_mode_none	No light
+$ostim_light_mode_rear	Rear light
+$ostim_light_mode_face	Face light
+
+$ostim_light_type_dim	Dim
+$ostim_light_type_bright	Bright
+
+$ostim_cum_action_none	No Action
+$ostim_cum_action_spit	Spit
+$ostim_cum_action_swallow	Swallow
+$ostim_cum_action_random	Random
+$ostim_cum_action_bottle_ask	Bottle, ask otherwise
+$ostim_cum_action_bottle_spit	Bottle, spit otherwise
+$ostim_cum_action_bottle_swallow	Bottle, swallow otherwise
+$ostim_cum_action_bottle_random	Bottle, random otherwise
+
+;== pages ==
+$ostim_page_configuration	Configuration
+$ostim_page_undress	Undressing
+$ostim_page_addons	Add-ons
+$ostim_page_about	About
+
+;== configuration ==
+$ostim_thanks	Thanks!
+$ostim_config_text	<font color='#939292'>OStim Settings
+
+$ostim_header_sex_scenes	Sex scenes
+$ostim_header_player_roles	Player Roles
+$ostim_header_orgasms	Orgasms
+$ostim_header_beds	Beds
+$ostim_header_excitement_bars	Excitement bars
+$ostim_header_system	System
+$ostim_header_undressing	Undressing
+$ostim_header_ai_control	Ai Control
+$ostim_header_freecam	FreeCam
+$ostim_header_keys	Keys
+$ostim_header_lights	Lights
+$ostim_header_save_load	Save and load settings.
+$ostim_header_osa_keys	OSA Keys
+
+$ostim_speed_control	Actors control speed
+$ostim_excitement_mult	Excitement multiplier
+$ostim_clippingless	Clipping-less first person
+$ostim_timescale	Custom timescale
+$ostim_use_fades	Fade out on intro/outro
+$ostim_end_on_hit	End if attacked
+$ostim_use_rumble	Use controller rumble
+$ostim_screenshake	Use extra screenshake
+$ostim_force_first	Force return to first person after scene
+$ostim_scaling	Disable Scaling
+$ostim_reset_position	Reset position after scene
+
+$ostim_force_gay_anims	Only use same sex animations for same sex scenes
+$ostim_always_dom_straight	Player Always Dom: Straight
+$ostim_always_sub_straight	Player Always Sub: Straight
+$ostim_always_dom_gay	Player Always Dom: Gay
+$ostim_always_sub_gay	Player Always Sub: Gay
+
+$ostim_orgasm_end_dom	End sex after Dom actor orgasm
+$ostim_orgasm_end_sub	End sex after Sub actor orgasm
+$ostim_orgasm_end_both	Require both actors to orgasm to end
+$ostim_slowmo_orgasm	Slow motion on orgasm
+$ostim_orgasm_boost_rel	Orgasm boosts relationship rank
+
+$ostim_use_beds	Use Beds
+$ostim_bed_search_rad	Bed search radius
+$ostim_bed_reallignment	Bed realignment
+$ostim_bed_algo	Use alternate bed search method
+
+$ostim_dom_bar	Main actor HUD bar
+$ostim_sub_bar	Second actor HUD bar
+$ostim_third_bar	Third actor HUD bar
+$ostim_auto_hide_bar	Autohide bars
+$ostim_match_color_gender	Match color to gender
+$ostim_hide_npc_bars	Hide bars in NPC-only scenes
+
+$ostim_reset_state	Reset thread state
+$ostim_update	Update all
+$ostim_mute_osa	Mute vanilla OSA sounds
+$ostim_tutorial	Enable tutorial messages
+$ostim_cosave	Fix keys & auto-mode
+
+$ostim_undress_start	Fully undress at start
+$ostim_undress_need	Remove clothes mid-scene
+$ostim_drop_clothes	Toss clothes onto ground
+$ostim_stronger_unequip	Use stronger unequip method
+$ostim_animate_redress	Use animated redress
+
+$ostim_full_auto	Enable full-auto control
+$ostim_force_auto_attacking	Force full-auto control if player attacking
+$ostim_force_auto_attacked	Force full-auto control if player is attacked
+$ostim_force_auto_consentual	Force full-auto control in consensual scenes
+$ostim_force_auto_masturbation	Force full-auto control for masturbation
+$ostim_auto_fades	Fade out in between animation transitions
+$ostim_ai_change_chance	AI Animation Change Chance
+
+$ostim_freecam	Switch to freecam mode on start
+$ostim_freecam_fov	Freecam FOV
+$ostim_default_fov	Default FOV
+$ostim_freecam_speed	Camera speed
+
+$ostim_main_key	Start sex with target
+$ostim_speed_up_key	Increase speed
+$ostim_speed_down_key	Decrease speed
+$ostim_pullout_key	Pull out
+$ostim_control_toggle_key	Switch control mode
+$ostim_tfc_key	Toggle freecam
+
+$ostim_dom_light_mode	Main actor light mode
+$ostim_sub_light_mode	Second actor light mode
+$ostim_dom_light_brightness	Main actor light brightness
+$ostim_sub_light_brightness	Second actor light brightness
+$ostim_dark_light	Only use lights in darkness
+
+$ostim_export	Export Settings
+$ostim_import	Import Settings
+$ostim_import_default	Import Default Settings
+$ostim_done	Done
+
+$ostim_import_no_file	No settings files found, default MCM settings used.
+$ostim_default_missing_error	OSTIM ERROR: DefaultOstimMCMSettings.json is missing, cannot load from default.
+
+;== undress ==
+$ostim_undress_about	What is this?
+$ostim_undress_text{}	<font color='#939292'>{} Undressing
+$ostim_undress_slots_header	Undressing slots
+$ostim_slot_30	S. 30 <font color='#317335'> Head
+$ostim_slot_31	S. 31 <font color='#317335'> Head/hair
+$ostim_slot_32	S. 32 <font color='#317335'> Body armor/clothes
+$ostim_slot_33	S. 33 <font color='#317335'> Gloves/gauntlets
+$ostim_slot_34	S. 34 <font color='#317335'> Forearms
+$ostim_slot_35	S. 35 <font color='#317335'> Amulet
+$ostim_slot_36	S. 36 <font color='#317335'> Ring
+$ostim_slot_37	S. 37 <font color='#317335'> Shoes
+$ostim_slot_38	S. 38 <font color='#317335'> Calves
+$ostim_slot_39	S. 39 <font color='#317335'> Shield
+$ostim_slot_40	S. 40 <font color='#317335'> Tail
+$ostim_slot_41	S. 41 <font color='#317335'> Long hair
+$ostim_slot_42	S. 42 <font color='#317335'> Circlet
+$ostim_slot_43	S. 43 <font color='#317335'> Ear rings
+
+$ostim_slot_44	S. 44 <font color='#31755c'> Face/mouth
+$ostim_slot_45	S. 45 <font color='#31755c'> Neck/scarf. Sometimes panties
+$ostim_slot_46	S. 46 <font color='#31755c'> Extra chest piece
+$ostim_slot_47	S. 47 <font color='#31755c'> Back (backpack, wings, etc)
+$ostim_slot_48	S. 48 <font color='#31755c'> Misc
+$ostim_slot_49	S. 49 <font color='#31755c'> Extra pelvis piece
+$ostim_slot_52	S. 52 <font color='#31755c'> Extra pelvis piece 2 | SchlongsofSkyrim
+$ostim_slot_53	S. 53 <font color='#31755c'> Extra leg piece
+$ostim_slot_54	S. 54 <font color='#31755c'> Extra leg piece 2
+$ostim_slot_55	S. 55 <font color='#31755c'> Face alternate or jewelry
+$ostim_slot_56	S. 56 <font color='#31755c'> Extra chest piece 2
+$ostim_slot_57	S. 57 <font color='#31755c'> Shoulder
+$ostim_slot_58	S. 58 <font color='#31755c'> Extra arm piece 2
+$ostim_slot_59	S. 59 <font color='#31755c'> Extra arm piece
+$ostim_slot_60	S. 60 <font color='#31755c'> Misc
+$ostim_slots_empty	No armor matching this slot on player.
+$ostim_slot_contains{}{}	Player has armor equipped that matches this slot\nName: {}\nFull slotmask: {}
+
+;== add-ons ==
+$ostim_addon_settings_text	<font color='#939292'>Add-on Settings
+$ostim_addon_or_npc_sexualities	Enable NPC sexualities
+$ostim_addon_or_difficulty	Difficulty modifier
+$ostim_addon_or_mainkey	Start dialogue
+$ostim_addon_or_colorblind	Enable colorless success indicator
+$ostim_addon_or_stationary	Enable gamepad control
+$ostim_addon_or_left_key	Left Key
+$ostim_addon_or_right_key	Right Key
+$ostim_addon_or_nakadashi	NPCs are not cautious about vaginal ejaculation
+$ostim_addon_on_stop	NPCs stop sex when spotted
+$ostim_addon_on_freq_mult	Sex frequency Multiplier
+$ostim_addon_os_key	Open search bar
+$ostim_addon_os_sex	Show sex animations
+$ostim_addon_os_hub	Show hub animations
+$ostim_addon_os_transitory	Show transitory animations
+$ostim_addon_oc_bounty	Public sex penalty
+$ostim_addon_oa_key	Show arousal
+$ostim_addon_oa_low_arousal_end	Require low arousal to end scene
+$ostim_addon_oa_stat_buffs	Stat buffs/debuffs
+$ostim_addon_oa_nudity_bc	Nudity increases arousal
+$ostim_addon_ov_fx	Breaking effects
+$ostim_addon_ov_chance	NPC virginity base chance
+$ostim_addon_op_freq	Approach frequency modifier
+$ostim_tooltip_op_freq	Increases the rate at which customers approach you
+
+;== osaKeys ==
+$ostim_osaKeys_mainMenu	OSA Main Menu
+$ostim_osaKeys_up	Up Navigation
+$ostim_osaKeys_down	Down Navigation
+$ostim_osaKeys_left	Left Navigation
+$ostim_osaKeys_right	Right Navigation
+$ostim_osaKeys_tog	Toggle
+$ostim_osaKeys_yes	Yes
+$ostim_osaKeys_end	End
+$ostim_osaKeys_reset	Reset OSA Keys to Defaults
+
+;== about ==
+$ostim_authors	Authors
+$ostim_by{}	by {}
+$ostim_links	Links
+
+;== message boxes==
+$ostim_message_update_close_menus	Close all menus now.
+$ostim_message_main_not_initialized	Anomaly detected in install, please reinstall OStim if it does not start properly.
+$ostim_message_slot_error	Slot error. Report to dev please.
+$ostim_message_export	Exporting to file, wait a second or two before clicking OK.
+$ostim_message_export_confirm	Are you sure you want to export settings? They will overwrite your stored settings.
+$ostim_message_import	Importing from file, wait a second or two before clicking OK.
+$ostim_message_import_confirm	Are you sure you want to import settings? They will overwrite the current settings.
+$ostim_message_import_no_file	Tried to import from file, but no file existed.
+$ostim_message_import_ml_settings	Importing modlist settings from file. Please wait a second or two before clicking OK.
+$ostim_message_reset_state	Reset state.
+$ostim_message_reset_osa_keys	OSA key bindings have been reset to their defaults.
+
+;== tooltips ==
+$ostim_tooltip_or_mainkey	Press this while looking at an NPC to start interacting.\nYou must save and reload for this setting to take affect.
+$ostim_tooltip_or_difficulty	Increasing this value makes actions easier. Lowering makes them harder. Lowering is not advised usually.
+$ostim_tooltip_oa_key	(Save and reload to take effect) Press this to view your arousal level.
+$ostim_tooltip_os_key	(Save and reload to take effect) Press this during a scene to open the search bar.
+$ostim_tooltip_or_sexuality	Leaving this off makes all NPCs bisexual.\nTurning it on allows them to be gay/bisexual/hetero.
+$ostim_tooltip_or_colorblind	Makes the success indicator use text instead of color.
+$ostim_tooltip_or_left_key	Left selection key\nSave and reload to take effect.
+$ostim_tooltip_or_right_key	Right selection key\nSave and reload to take effect.
+$ostim_tooltip_or_nakadashi	Female NPCs are not cautious about you ejaculating inside them before a relationship and sometimes marriage.\nMostly for users with no pregnancy mod.
+$ostim_tooltip_on_freq_mult	The frequency at which NPCs will try to have sex with each other.
+$ostim_tooltip_oc_bounty	The bounty you will recieve if caught by a guard having sex in public.
+$ostim_tooltip_on_stop	If checked, NPCs will stop having sex if they know the player can see them.
+$ostim_tooltip_oa_low_arousal_end	When enabled, scenes will not end until your arousal drops below around 15%.
+$ostim_tooltip_os_hub	Show hub (non-sex idle animations) in the results.
+$ostim_tooltip_os_transitory	Show transition animations in the results.
+$ostim_tooltip_os_sex	Show sex animations in the results.
+$ostim_tooltip_oa_nudity_bc	When enabled, player nudity will make nearby NPCs hornier.\n Note that regardless of this setting, anyone including you viewing an OStim scene will become hornier.
+$ostim_tooltip_oa_stat_buffs	(Save and reload to take effect) Stamina regen rate will increase as you get hornier. Magicka rate will decrease.
+$ostim_tooltip_orgasm_end_dom	End the Osex scene automatically when the dominant actor (usually the male) orgasms.
+$ostim_tooltip_orgasm_end_sub	End the Osex scene automatically when the submissive actor (usually the female) orgasms.
+$ostim_tooltip_orgasm_end_both	Will prevent the above 2 settings from ending the scene if both actors have not had an orgasm at least once.
+$ostim_tooltip_reset	Click this if you keep getting a Scene Already Running type error.
+$ostim_tooltip_undressing_about	This panel lets you select what armor slots are stripped by OStim. See this if you don't know what that is:\nhttps://www.creationkit.com/index.php?title=Biped_Object\nThese slots will apply to both the player AND NPCs.\nSlots where the name is green mean that Bethesda designated that slot to be used that way.\nCyan names mean that the community has designated that slot to be used that way.\nMany mods do not use the proper slots, so take the names with a grain of salt.\nMouse over the names to see if you are wearing an armor piece in that slot.
+$ostim_tooltip_ai_attacked	If using manual mode by default, this will force automatic mode to activate if the player is the victim in an aggressive scene.
+$ostim_tooltip_ai_attacking	If using manual mode by default, this will force automatic mode to activate if the player is the attacker in an aggressive scene.
+$ostim_tooltip_ai_consent	If using manual mode by default, this will force automatic mode to activate in consensual scenes.
+$ostim_tooltip_ai_masturbation	If using manual mode by default, this will force automatic mode to activate for player masturbation scenes.
+$ostim_tooltip_fades	Fade the screen to black when a scene starts/ends.
+$ostim_tooltip_scaling	Disables actor scaling. Warning: This will cause misalignment!
+$ostim_tooltip_cosave	Some users appear to have a broken SKSE co-save setup.\n This manifests itself as full-auto mode not working, and keys not saving.\nThis will fix the symptoms of the issue if you have it, but not the core cause.
+$ostim_tooltip_fov	Sets the field of view of the camera when in freecam mode.\nThis is incompatible with Improved Camera.
+$ostim_tooltip_rumble	Rumble a controller on thrust, if a controller is being used.
+$ostim_tooltip_gendered_colors	Change the color of the bars to match the gender of the character.
+$ostim_tooltip_npc_bars	Do not show excitement bars if the player is not in a scene.
+$ostim_tooltip_stronger_unequip	Use an alternate unequip method that may catch more armor pieces, especially armor with auto-reequip scripts.\nHowever, some armor it unequips may not be reequipped in redress.\nHas no effect if drop clothes on to ground is enabled.
+$ostim_tooltip_end_on_hit	End the scene after someone in the scene is hit.\n Can misfire with certain other mods.
+$ostim_tooltip_animate_redress	Makes NPCs play redressing animations after a scene ends if they need to redress. (requires OpenSex)
+$ostim_tooltip_force_first	Return to first person after scene ends.\nFixes the hybrid-camera bug in Improved Camera.
+$ostim_tooltip_custom_timescale	Changes the timescale during sex scenes, and reverts it back to what it was after the scene ends.\nUseful if you don't want sex taking an entire day.\n0 = this feature is disabled.
+$ostim_tooltip_clippingless	REQUIRES: Improved Camera and my custom ini settings file.\nExperience first person without any clipping.
+$ostim_tooltip_speed_control	Let actors increase the scene speed on their own when their Excitement gets high enough .\nThis feature is experimental, disable if Osex behaves strangely on it's own.
+$ostim_tooltip_reset_position	Reset actors to where the where when the scene started, when the scene ends.
+$ostim_tooltip_undress_if_need	If actors' genitals are covered by clothes, this will auto-remove the clothes as soon as they need access to their genitals.
+$ostim_tooltip_bed_search_dist	High values may increase animation start time.
+$ostim_tooltip_bed_algo	Use a slower papyrus bed search method rather than a faster native one.\n May find more beds but only enable if a bed is not detected.
+$ostim_tooltip_auto_fades	Fade to black in between animation transitions.
+$ostim_tooltip_ai_change_chance	Chance that characters will switch animations mid scene.\nDoes not affect chance of a foreplay -> full sex transition.
+$ostim_tooltip_drop_clothes	Characters will drop clothes they take off onto the ground instead of storing them in their inventory.\nCharacters will automatically pick them up when redressing.
+$ostim_tooltip_always_undress	Actors will always get undressed as a scene starts.\nMods using this mod's API can force an undress to occur even if this isn't checked.
+$ostim_tooltip_dom_bar	Enable the on-screen bar that tracks the dominant actor's Excitement.\nActor's orgasm when their Excitement maxes out.
+$ostim_tooltip_third_bar	Enable the on-screen bar that tracks the third actor's Excitement.\nActor's orgasm when their Excitement maxes out.
+$ostim_tooltip_sub_bar	Enable the on-screen bar that tracks the second actor's Excitement.\nActor's orgasm when their Excitement maxes out.
+$ostim_tooltip_enable_beds	Actors will find the nearest bed to have sex on.
+$ostim_tooltip_enable_tutorial	If OStim or any addon contains a tutorial, disabling this will hide those tutorial messages.
+$ostim_tooltip_update	Try to flush out old scripts.\nMay not be reliable, perform a clean install if you get weird behavior after updating.
+$ostim_tooltip_enable_ai	If enabled, scenes will play out on their own without user input via procedural generation.\nNote: If you have only used Manual mode briefly or not at all, and never became adept with using it, I STRONGLY recommend you give manual mode a fair chance before using this.
+$ostim_tooltip_auto_hide_bar	Automatically hide the bars during sex when not interacting with the UI.
+$ostim_tooltip_slowmo_orgasms	Add in a few seconds of slow-motion right when the player orgasms.
+$ostim_tooltip_orgasm_boosts_rel	Giving orgasms to actors you have a relationship rank of 0 with will increase them to rank 1, marking them as a friend.\nThis may open up unique options in some mods.
+$ostim_tooltip_dom_light	Enable light on main actor at animation start.
+$ostim_tooltip_mute_osa	Mute sounds coming from the OSA engine.\nYou should probably only disable this if you have a soundpack installed.
+$ostim_tooltip_sub_light	Enable light on second actor at animation start.
+$ostim_tooltip_fc_speed	Set the speed of the freecam.
+$ostim_tooltip_auto_fc	Automatically switch to freecam when a scene starts.
+$ostim_tooltip_fc_fov	Set the field of view to return to when a scene ends when using free cam.
+$ostim_tooltip_dom_brightness	Set main actor's light's brightness.
+$ostim_tooltip_sub_brightness	Set second actor's light's brightness.
+$ostim_tooltip_tfc_key	Toggle freecam during scenes involving the player.\n If using Improved Camera, make sure Clipping-less First Person is enabled when using this.
+$ostim_tooltip_control_toggle_key	Press during an animation: switch between manual and full-auto control for the duration of that animation.\n Press outside of animation: switch between manual and full-auto control permanently.
+$ostim_tooltip_dark_light	Only use actor lights when the scene takes place in a dark area.
+$ostim_tooltip_excitement_mult	Multiply all the pleasure/second received by actors by this amount.\nThis effectively lets you choose how long you want sex to last.\n3.0 = 3 times shorter, 0.1 = 10 times longer.
+$ostim_tooltip_main_key	Press this while looking at an actor to start OStim.\nStarting OSex through OSA will result in normal OSex instead.\nOStim is intended to be played with mods that integrate it into the game instead of using this option.
+$ostim_tooltip_speed_up_key	Increase speed during OStim scene.\nThe default key (numpad +) conflicts with many mods, may need to remap.
+$ostim_tooltip_speed_down_key	Decrease speed during OStim scene.\nThe default key (numpad -) conflicts with many mods, may need to remap.
+$ostim_tooltip_screen_shake	Use extra screenshake on thrust.\n This is not compatible with Improved Camera's first person.
+$ostim_tooltip_bed_reallignment	Move actors forward/back by this amount on a bed.
+$ostim_tooltip_pullout_key	Only usable in manual mode.\nWhen pressed during a sexual animation, causes your character to immediately cancel and \"pull out\" of the current animation.
+$ostim_tooltip_thanks	Thank you for downloading OStim.\nLeave a comment and also share it with others online if you enjoy it, to help others find it.
+$ostim_tooltip_always_sub_straight	Forces the player to always take the Sub role during Straight scenes.\nIf neither are enabled default actor placement will take place, if both are enabled player will default to Dom.\nNote that individual mods can temporarily override this setting.
+$ostim_tooltip_always_sub_gay	Forces the player to always take the Sub role during Gay scenes.\nIf neither are enabled default actor placement will take place, if both are enabled player will default to Dom.\nNote that individual mods can temporarily override this setting.
+$ostim_tooltip_always_dom_straight	Forces the player to always take the Dom role during Straight scenes.\nIf neither are enabled default actor placement will take place, if both are enabled player will default to Dom.\nNote that individual mods can temporarily override this setting.
+$ostim_tooltip_always_dom_gay	Forces the player to always take the Dom role during Gay scenes.\nIf neither are enabled default actor placement will take place, if both are enabled player will default to Dom.\nNote that individual mods can temporarily override this setting.
+$ostim_tooltip_force_gay_anims	In a same sex scene (Gay & Lesbian) only same sex animations will be used. There is no fallback in this option, so be aware that you will probably have limited animation options.
+$ostim_tooltip_ov_fx	Show hymen breaking effect and play sound when virginity is lost
+$ostim_tooltip_ov_chance	The chance of an average NPC being a virgin\n Married NPCs and prostitutes will have this value overriden
+$ostim_tooltip_export	Click this button to export the Ostim MCM settings.
+$ostim_tooltip_import	Click this button to import the Ostim MCM settings.
+$ostim_tooltip_import_default	Click this button to import the Default Ostim MCM settings.
+$ostim_message_import_old_api	Auto-imported settings are from an older OStim version, please re-export your mcm settings if you experience issues
+$ostim_tooltip_osa_main_menu	OSA main menu for scene configuration.
+$ostim_tooltip_osa_up	Key used to go to up in the OStim and OSA menus.
+$ostim_tooltip_osa_down	Key used to go to down in the OStim and OSA menus.
+$ostim_tooltip_osa_left	Key used to go to left in the OStim and OSA menus.
+$ostim_tooltip_osa_right	Key used to go to right in the OStim and OSA menus.
+$ostim_tooltip_osa_tog	Toggle key to switch menus when multiple choices are available. Also can be used to switch actors when multiple characters can be affected.
+$ostim_tooltip_osa_yes	Key used to activate the currently selected option in the OStim and OSA interface.
+$ostim_tooltip_osa_end	Key used to end OStim scenes.
