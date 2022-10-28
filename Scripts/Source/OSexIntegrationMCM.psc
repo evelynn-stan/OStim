@@ -64,9 +64,9 @@ String[] DomLightBrightList
 
 ; bed settings
 Int SetEnableBeds
+Int SetConfirmBed
 Int SetBedSearchDistance
 Int SetBedReallignment
-int SetBedAlgo
 
 ; ai control settings
 Int SetAIControl
@@ -333,9 +333,9 @@ Event OnPageReset(String Page)
 
 		AddColoredHeader("$ostim_header_beds")
 		SetEnableBeds = AddToggleOption("$ostim_use_beds", Main.UseBed)
+		SetConfirmBed = AddToggleOption("$ostim_confirm_bed", Main.ConfirmBed)
 		SetBedSearchDistance = AddSliderOption("$ostim_bed_search_rad", Main.BedSearchDistance, "{0} meters")
 		SetBedReallignment = AddSliderOption("$ostim_bed_reallignment", Main.BedReallignment, "{0} units")
-		SetBedAlgo = AddToggleOption("$ostim_bed_algo", Main.UseAlternateBedSearch)
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_excitement_bars")
@@ -662,6 +662,9 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetEnableBeds)
 		Main.UseBed = !Main.UseBed
 		SetToggleOptionValue(Option, Main.UseBed)
+	ElseIf (Option == SetConfirmBed)
+		Main.ConfirmBed = !Main.ConfirmBed
+		SetToggleOptionValue(Option, Main.ConfirmBed)
 	ElseIf (Option == SetTutorialMessages)
 		Main.ShowTutorials = !Main.ShowTutorials
 		SetToggleOptionValue(Option, Main.ShowTutorials)
@@ -716,9 +719,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetUndressIfneed)
 		Main.AutoUndressIfNeeded = !Main.AutoUndressIfNeeded
 		SetToggleOptionValue(Option, Main.AutoUndressIfNeeded)
-	ElseIf (Option == SetBedAlgo)
-		Main.UseAlternateBedSearch = !Main.UseAlternateBedSearch
-		SetToggleOptionValue(Option, Main.UseAlternateBedSearch)
 	ElseIf (Option == SetClipinglessFirstPerson)
 		Main.EnableImprovedCamSupport = !Main.EnableImprovedCamSupport
 		SetToggleOptionValue(Option, Main.EnableImprovedCamSupport)
@@ -909,8 +909,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_undress_if_need")
 	ElseIf (Option == SetBedSearchDistance)
 		SetInfoText("$ostim_tooltip_bed_search_dist")
-	ElseIf (Option == SetBedAlgo)
-		SetInfoText("$ostim_tooltip_bed_algo")
 	ElseIf (Option == SetUseAutoFades)
 		SetInfoText("$ostim_tooltip_auto_fades")
 	ElseIf (Option == SetAIChangeChance)
@@ -927,6 +925,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_sub_bar")
 	ElseIf (Option == SetEnableBeds)
 		SetInfoText("$ostim_tooltip_enable_beds")
+	ElseIf (Option == SetConfirmBed)
+		SetInfoText("$ostim_tooltip_confirm_bed")
 	ElseIf (Option == SetTutorialMessages)
 		SetInfoText("$ostim_tooltip_enable_tutorial")
 	ElseIf (Option == setupdate)
@@ -1395,9 +1395,9 @@ Function ExportSettings()
 
 	; Bed settings export.
 	JMap.SetInt(OstimSettingsFile, "SetEnableBeds", Main.UseBed as Int)
+	JMap.SetInt(OstimSettingsFile, "SetConfirmBed", Main.ConfirmBed as Int)
 	JMap.SetInt(OstimSettingsFile, "SetBedSearchDistance", Main.BedSearchDistance as Int)
 	JMap.SetInt(OstimSettingsFile, "SetBedReallignment", Main.BedReallignment as Int)
-	JMap.SetInt(OstimSettingsFile, "SetBedAlgo", Main.UseAlternateBedSearch as Int)
 
 	; Ai/Control settings export.
 	JMap.SetInt(OstimSettingsFile, "SetAIControl", Main.UseAIControl as Int)
@@ -1637,9 +1637,9 @@ Function ImportSettings(bool default = false)
 
 	; Bed settings export.
 	Main.UseBed = JMap.GetInt(OstimSettingsFile, "SetEnableBeds")
+	Main.ConfirmBed = JMap.GetInt(OstimSettingsFile, "SetConfirmBed")
 	Main.BedSearchDistance = JMap.GetInt(OstimSettingsFile, "SetBedSearchDistance")
 	Main.BedReallignment = JMap.GetInt(OstimSettingsFile, "SetBedReallignment")
-	Main.UseAlternateBedSearch = JMap.GetInt(OstimSettingsFile, "SetBedAlgo")
 	Main.AiSwitchChance = JMap.GetInt(OstimSettingsFile, "SetAIChangeChance")
 	
 	;Orgasm settings
