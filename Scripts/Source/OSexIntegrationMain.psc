@@ -29,6 +29,13 @@ ScriptName OSexIntegrationMain Extends Quest
 ;			 ╚═════╝ ╚══════╝   ╚═╝   ╚═╝╚═╝     ╚═╝
 
 
+; -------------------------------------------------------------------------------------------------
+; PROPERTIES  -------------------------------------------------------------------------------------
+
+
+Faction Property OStimNoFacialExpressionsFaction Auto
+Faction Property OStimExcitementFaction Auto
+
 
 ; -------------------------------------------------------------------------------------------------
 ; SETTINGS  ---------------------------------------------------------------------------------------
@@ -159,6 +166,20 @@ Bool SMPInstalled
 Bool Property Installed auto
 
 Int[] Property StrippingSlots Auto
+
+GlobalVariable Property OStimDisableScaling Auto
+bool Property DisableScaling
+	bool Function Get()
+		Return OStimDisableScaling.value != 0
+	EndFunction
+	Function Set(bool Value)
+		If Value
+			OStimDisableScaling.value = 1
+		Else
+			OStimDisableScaling.value = 0
+		EndIf
+	EndFunction
+EndProperty
 
 int Property InstalledVersion Auto
 
@@ -471,6 +492,8 @@ Bool Function StartScene(Actor Dom, Actor Sub, Bool zUndressDom = False, Bool zU
 		Else
 			Offsets[i] = 0
 		EndIf
+
+		Actors[i].AddToFaction(OStimExcitementFaction)
 	EndWhile
 
 	If (Aggressive)
@@ -575,25 +598,20 @@ Event OnUpdate() ;OStim main logic loop
 	Actro[0] = DomActor
 
 	RegisterForModEvent("ostim_setvehicle", "OnSetVehicle")
+	; OBarsScript already registers for the ostim_orgasm event and is attacked to the same quest
+	; so this registration will not work, but renaming the listener to OstimOrgasm will, as that is what OBarsScript registered it to
+	; if we ever split the scripts up on different quests we have to register for the event here again
+	;RegisterForModEvent("ostim_orgasm", "OnOrgasm")
 	
 
 	String DomFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(DomActor))
 	RegisterForModEvent("0SSO" + DomFormID + "_Sound", "OnSoundDom")
-	RegisterForModEvent("0SAA" + DomFormID + "_BlendMo", "OnMoDom")
-	RegisterForModEvent("0SAA" + DomFormID + "_BlendPh", "OnPhDom")
-	RegisterForModEvent("0SAA" + DomFormID + "_BlendEx", "OnExDom")
 	If (SubActor)
 		String SubFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(SubActor))
 		RegisterForModEvent("0SSO" + SubFormID + "_Sound", "OnSoundSub")
-		RegisterForModEvent("0SAA" + SubFormID + "_BlendMo", "OnMoSub")
-		RegisterForModEvent("0SAA" + SubFormID + "_BlendPh", "OnPhSub")
-		RegisterForModEvent("0SAA" + SubFormID + "_BlendEx", "OnExSub")
 		If (ThirdActor)
 			String ThirdFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(ThirdActor)) 
 			RegisterForModEvent("0SSO" + ThirdFormID + "_Sound", "OnSoundThird")
-			RegisterForModEvent("0SAA" + ThirdFormID + "_BlendMo", "OnMoThird")
-			RegisterForModEvent("0SAA" + ThirdFormID + "_BlendPh", "OnPhThird")
-			RegisterForModEvent("0SAA" + ThirdFormID + "_BlendEx", "OnExThird")
 		EndIf
 	EndIf
 
@@ -777,9 +795,11 @@ Event OnUpdate() ;OStim main logic loop
 			DomExcitement += GetCurrentStimulation(DomActor) * DomStimMult
 			If SubActor
 				SubExcitement += GetCurrentStimulation(SubActor) * SubStimMult
+				SubActor.SetFactionRank(OStimExcitementFaction, SubExcitement as int)
 			EndIf
 			If ThirdActor
 				ThirdExcitement += GetCurrentStimulation(ThirdActor) * ThirdStimMult
+				ThirdActor.SetFactioNRank(OStimExcitementFaction, ThirdExcitement as int)
 			EndIf
 		EndIf
 		;Profile("Stim calculation")
@@ -801,6 +821,8 @@ Event OnUpdate() ;OStim main logic loop
 				EndIf
 			EndIf
 		EndIf
+				
+		DomActor.SetFactionRank(OStimExcitementFaction, DomExcitement as int)
 
 		If (ThirdExcitement >= 100.0)
 			MostRecentOrgasmedActor = ThirdActor
@@ -838,11 +860,13 @@ Event OnUpdate() ;OStim main logic loop
 		If Offsets[i] != 0
 			OUtils.RestoreOffset(Actors[i], Offsets[i])
 		EndIf
+
+		Actors[i].RemoveFromFaction(OStimExcitementFaction)
 	EndWhile
 
 	SendModEvent("ostim_end", numArg = -1.0)
 
-	If !ForceCloseOStimThread
+	If !ForceCloseOStimThread && !DisableScaling
 		RestoreScales()
 	EndIf
 
@@ -884,21 +908,12 @@ Event OnUpdate() ;OStim main logic loop
 
 
 	UnRegisterForModEvent("0SSO" + DomFormID + "_Sound")
-	UnRegisterForModEvent("0SAA" + DomFormID + "_BlendMo")
-	UnRegisterForModEvent("0SAA" + DomFormID + "_BlendPh")
-	UnRegisterForModEvent("0SAA" + DomFormID + "_BlendEx")
 	If (SubActor)
 		String SubFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(SubActor))
 		UnRegisterForModEvent("0SSO" + SubFormID + "_Sound")
-		UnRegisterForModEvent("0SAA" + SubFormID + "_BlendMo")
-		UnRegisterForModEvent("0SAA" + SubFormID + "_BlendPh")
-		UnRegisterForModEvent("0SAA" + SubFormID + "_BlendEx")
 		If (ThirdActor)
 			String ThirdFormID = _oGlobal.GetFormID_S(OSANative.GetLeveledActorBase(ThirdActor)) 
 			UnRegisterForModEvent("0SSO" + ThirdFormID + "_Sound")
-			UnRegisterForModEvent("0SAA" + ThirdFormID + "_BlendMo")
-			UnRegisterForModEvent("0SAA" + ThirdFormID + "_BlendPh")
-			UnRegisterForModEvent("0SAA" + ThirdFormID + "_BlendEx")
 		EndIf
 	EndIf
 
@@ -2057,9 +2072,6 @@ Function OnAnimationChange()
 
 			ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
 			RegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound", "OnSoundThird")
-			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendMo", "OnMoThird")
-			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendPh", "OnPhThird")
-			RegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx", "OnExThird")
 
 			Actors = PapyrusUtil.PushActor(Actors, ThirdActor)
 
@@ -2068,6 +2080,8 @@ Function OnAnimationChange()
 			If nioverride.HasNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")
 				Offsets[2] = nioverride.GetNodeTransformPosition(Actors[2], False, isFemale, "NPC", "internal")[2]
 			EndIf
+
+			ThirdActor.AddToFaction(OStimExcitementFaction)
 
 			SendModEvent("ostim_thirdactor_join")
 		Else
@@ -2078,9 +2092,6 @@ Function OnAnimationChange()
 
 		ActorBase thirdActorBase = OSANative.GetLeveledActorBase(ThirdActor)
 		UnRegisterForModEvent("0SSO" + _oGlobal.GetFormID_S(thirdActorBase) + "_Sound")
-		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendMo")
-		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendPh")
-		UnRegisterForModEvent("0SAA" + _oGlobal.GetFormID_S(thirdActorBase) + "_BlendEx")
 
 		Actors = PapyrusUtil.ResizeActorArray(Actors, 2)
 
@@ -2088,9 +2099,13 @@ Function OnAnimationChange()
 			OUtils.RestoreOffset(Actors[2], Offsets[2])
 		EndIf
 
+		ThirdActor.RemoveFromFaction(OStimExcitementFaction)
+
 		Offsets = PapyrusUtil.ResizeFloatArray(Offsets, 2)
 
-		ThirdActor.SetScale(1.0)
+		If !DisableScaling
+			ThirdActor.SetScale(1.0)
+		EndIf
 
 		; Enable Precision mod collisions again for the actor that is leaving
 		TogglePrecisionForActor(ThirdActor, true)
@@ -2100,8 +2115,6 @@ Function OnAnimationChange()
 
 		SendModEvent("ostim_thirdactor_leave") ; careful, getthirdactor() won't work in this event
 	EndIf
-
-	int i = Actors.Length
 
 	Rescale()
 
@@ -2420,11 +2433,13 @@ Function SetActorExcitement(Actor Act, Float Value)
 	Else
 		Console("Unknown Actor")
 	EndIf
+
+	Act.SetFactionRank(OStimExcitementFaction, Value as int)
 EndFunction
 
 Function Orgasm(Actor Act)
 	SetActorExcitement(Act, -3.0)
-	SendModEvent("ostim_orgasm")
+	Act.SendModEvent("ostim_orgasm")
 	If (Act == PlayerRef)
 		NutEffect.Apply()
 		If (SlowMoOnOrgasm)
@@ -2460,6 +2475,18 @@ Function Orgasm(Actor Act)
 	Act.DamageActorValue("stamina", 250.0)
 EndFunction
 
+Event OstimOrgasm(String EventName, String Args, Float Nothing, Form Sender)
+	Actor Act = Sender As Actor
+	If !FaceDataIsMuted(Act)
+		; if we don't mute FaceData here OSAs constant sound spamming will override the climax face after 1-2 seconds
+		MuteFaceData(Act)
+		; SendExpressionEvent will not automatically reset the face back to default because FaceData is muted...
+		SendExpressionEvent(Act, "climax")
+		; ...but unmuting FaceData will reset it, so we're good
+		UnMuteFaceData(Act)
+	EndIf
+EndEvent
+
 Function SetOrgasmStall(Bool Set)
 	StallOrgasm = Set
 EndFunction
@@ -2475,6 +2502,7 @@ Bool BlockSubFaceCommands
 Bool BlockThirdFaceCommands
 
 Function MuteFaceData(Actor Act)
+	Act.AddToFaction(OstimNoFacialExpressionsFaction)
 	If (Act == DomActor)
 		BlockDomFaceCommands = True
 	Elseif (Act == SubActor)
@@ -2485,6 +2513,7 @@ Function MuteFaceData(Actor Act)
 EndFunction
 
 Function UnMuteFaceData(Actor Act)
+	Act.RemoveFromFaction(OstimNoFacialExpressionsFaction)
 	If (Act == DomActor)
 		BlockDomFaceCommands = False
 	Elseif (Act == SubActor)
@@ -2492,16 +2521,15 @@ Function UnMuteFaceData(Actor Act)
 	Elseif (Act == ThirdActor)
 		BlockthirdFaceCommands = False
 	EndIf
+
+	int i = Actors.Find(Act)
+	If i != -1
+		OSANative.UpdateExpression(CurrentAnimation, i, Act)
+	EndIf
 EndFunction
 
 Bool Function FaceDataIsMuted(Actor Act)
-	If (Act == DomActor)
-		Return BlockDomFaceCommands
-	Elseif (Act == SubActor)
-		Return BlocksubFaceCommands
-	Elseif (Act == ThirdActor)
-		Return BlockthirdFaceCommands
-	EndIf
+	Return Act.IsInFaction(OstimNoFacialExpressionsFaction)
 EndFunction
 
 Event OnMoDom(String EventName, String zType, Float zAmount, Form Sender)
@@ -2579,6 +2607,7 @@ EndEvent
 
 Function OnEx(Actor Act, Int zType, Int zAmount) ;expression related face blending
 	;Console("Expression event: " + "Type: " + type + " Amount: " + amount)
+	MfgConsoleFunc.SetPhonemeModifier(Act, 2, zType, zAmount)
 	Act.SetExpressionOverride(zType, zAmount)
 EndFunction
 
@@ -2652,16 +2681,24 @@ Function OnSound(Actor Act, Int SoundID, Int FormNumber)
 		EndIf
 	EndIf
 
+	bool PlayExpression = False
 	If (!MuteOSA) || IntArrayContainsValue(SoundFormNumberWhitelist, FormID)
 		PlayOSASound(Act, Formid, Soundid)
+		If FormNumber != 20
+			PlayExpression = True
+		EndIf
 	EndIf
 
+	String EventName = "moan"
 	If (FormNumber == 60)
 		OnSpank()
 		ShakeController(0.3)
 		If (UseScreenShake && ((DomActor == PlayerRef) || (SubActor == PlayerRef)))
 			ShakeCamera(0.5)
 		EndIf
+
+		PlayExpression = True
+		EventName = "spank"
 	EndIf
 
 	If (FormNumber == 50)
@@ -2681,8 +2718,27 @@ Function OnSound(Actor Act, Int SoundID, Int FormNumber)
 	Arg += "," + FormId
 	Arg += "," + SoundId
 	SendModEvent("ostim_osasound", StrArg = Arg)
+	
+	If PlayExpression && !FaceDataIsMuted(Act)
+		SendExpressionEvent(Act, EventName)
+	EndIf
+EndFunction
 
-	;Console("Sound: " + arg)
+;/* SendExpressionEvent
+* * plays the event expression and if it is valid resets the expression when it's over
+* * contains a Utility::Wait call, so best only call this from event listeners
+*/;
+Function SendExpressionEvent(Actor Act, string EventName)
+	int Position = Actors.find(Act)
+	If Position == -1
+		Return
+	EndIf
+
+	float Duration = OSANative.PlayExpressionEvent(CurrentSceneID, Position, Act, EventName)
+	If Duration != -1
+		Utility.Wait(Duration)
+		OSANative.UpdateExpression(CurrentSceneID, Position, Act)
+	EndIf
 EndFunction
 
 Event OnFormBind(String EventName, String zMod, Float IxID, Form Sender)
@@ -3530,11 +3586,6 @@ Function Startup()
 
 	OControl.ResetControls()
 	OControl.UpdateControls() ; uneeded?
-
-	;If (SKSE.GetPluginVersion("ImprovedCamera") == -1)
-		;Debug.Notification("OStim: Improved Camera is not installed. First person scenes unavailable.")
-		;Debug.Notification("OStim: However, freecam will have extra features.")
-	;EndIf
 
 	If (!_oGlobal.OStimGlobalLoaded())
 		Debug.MessageBox("It appears you have the OSex facial expression fix installed. Please exit and remove that mod, as it is now included in OStim, and having it installed will break some things now!")
