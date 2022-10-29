@@ -112,6 +112,7 @@ Int Property ControlToggleKey Auto
 
 Bool Property UseBed Auto
 Bool Property ConfirmBed Auto
+Message Property OStimBedConfirmationMessage Auto
 
 Bool Property UseAIControl Auto
 Bool Property OnlyGayAnimsInGayScenes auto
@@ -618,7 +619,7 @@ Event OnUpdate() ;OStim main logic loop
 		Currentbed = FindBed(DomActor)
 
 		If (CurrentBed)
-			If !ConfirmBed || !IsPlayerInvolved() || True
+			If !ConfirmBed || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0
 				UsingBed = True
 			Else
 				CurrentBed = None
