@@ -36,6 +36,9 @@ ScriptName OSexIntegrationMain Extends Quest
 Faction Property OStimNoFacialExpressionsFaction Auto
 Faction Property OStimExcitementFaction Auto
 
+; for compatibility with naughty voices
+Faction Property NVCustomOrgasmFaction Auto
+
 
 ; -------------------------------------------------------------------------------------------------
 ; SETTINGS  ---------------------------------------------------------------------------------------
@@ -2459,12 +2462,15 @@ EndFunction
 
 Event OstimOrgasm(String EventName, String Args, Float Nothing, Form Sender)
 	Actor Act = Sender As Actor
+	If Act.IsInFaction(NVCustomOrgasmFaction)
+		Return
+	EndIf
+
 	If !FaceDataIsMuted(Act)
 		; if we don't mute FaceData here OSAs constant sound spamming will override the climax face after 1-2 seconds
 		MuteFaceData(Act)
-		; SendExpressionEvent will not automatically reset the face back to default because FaceData is muted...
 		SendExpressionEvent(Act, "climax")
-		; ...but unmuting FaceData will reset it, so we're good
+		; since SendExpressionEvent contains a Utility::Wait call this line will execute once the orgasm expression is over
 		UnMuteFaceData(Act)
 	EndIf
 EndEvent
