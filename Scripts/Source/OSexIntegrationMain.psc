@@ -111,6 +111,8 @@ Int Property PullOutKey Auto
 Int Property ControlToggleKey Auto
 
 Bool Property UseBed Auto
+Bool Property ConfirmBed Auto
+Message Property OStimBedConfirmationMessage Auto
 
 Bool Property UseAIControl Auto
 Bool Property OnlyGayAnimsInGayScenes auto
@@ -152,8 +154,6 @@ Bool Property ForceFirstPersonAfter Auto
 
 Bool Property UseNativeFunctions Auto
 Bool Property BlockVRInstalls Auto
-
-Bool Property UseAlternateBedSearch Auto
 
 Int Property AiSwitchChance Auto
 
@@ -617,8 +617,13 @@ Event OnUpdate() ;OStim main logic loop
 
 	If (!UsingBed && UseBed)
 		Currentbed = FindBed(DomActor)
+
 		If (CurrentBed)
-			UsingBed = True
+			If !ConfirmBed || !IsPlayerInvolved() || OStimBedConfirmationMessage.Show() == 0
+				UsingBed = True
+			Else
+				CurrentBed = None
+			EndIf
 		EndIf
 	EndIf
 
@@ -1674,45 +1679,22 @@ ObjectReference Function FindBed(ObjectReference CenterRef, Float Radius = 0.0)
 		Radius = BedSearchDistance * 64.0
 	EndIf
 
-	ObjectReference[] Beds
-	If (!UseAlternateBedSearch) && (UseNativeFunctions)
-		Console("Using native bed search")
-		Beds = OSANative.FindBed(CenterRef, Radius, 96.0)
-	Else
-		Console("Using papyrus bed search")
-		Beds = MiscUtil.ScanCellObjects(40, CenterRef, Radius, Keyword.GetKeyword("RaceToScale"))
-	EndIf
+	ObjectReference[] Beds = OSANative.FindBed(CenterRef, Radius, 96.0)
 
 	ObjectReference NearRef = None
 
 	Int i = 0
 	Int L = Beds.Length
-	If (!UseAlternateBedSearch) && (UseNativeFunctions)
-		While (i < L)
-			ObjectReference Bed = Beds[i]
-			If (!Bed.IsFurnitureInUse())
-				NearRef = Bed
-				i = L
-			Else
-				i += 1
-			EndIf
-		EndWhile
-	Else
-		Float Z = CenterRef.GetPositionZ()
-		While (i < L)
-			ObjectReference Bed = Beds[i]
-			If (IsBed(Bed) && !Bed.IsFurnitureInUse() && SameFloor(Bed, Z))
-				If (!NearRef)
-					NearRef = Bed
-				Else
-					If (NearRef.GetDistance(CenterRef) > Bed.GetDistance(CenterRef))
-						NearRef = Bed
-					EndIf
-				EndIf
-			EndIf
+
+	While (i < L)
+		ObjectReference Bed = Beds[i]
+		If (!Bed.IsFurnitureInUse())
+			NearRef = Bed
+			i = L
+		Else
 			i += 1
-		EndWhile
-	EndIf
+		EndIf
+	EndWhile
 
 	If (NearRef)
 		Console("Bed found")
@@ -3148,8 +3130,6 @@ UseFreeCam
 	If (!UseNativeFunctions)
 		Console("Native function DLL failed to load. Falling back to papyrus implementations")
 	EndIf
-	UseAlternateBedSearch = !UseNativeFunctions
-	;UseAlternateBedSearch = True
 
 	ShowTutorials = true 
 	
