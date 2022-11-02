@@ -7,6 +7,7 @@ Int SetClipinglessFirstPerson
 Int SetEndAfterActorHit
 Int SetUseRumble
 Int SetUseScreenShake
+Int SetScaling
 int SetResetPosition
 int SetOnlyGayAnimsInGayScenes
 
@@ -64,9 +65,9 @@ String[] DomLightBrightList
 
 ; bed settings
 Int SetEnableBeds
+Int SetConfirmBed
 Int SetBedSearchDistance
 Int SetBedReallignment
-int SetBedAlgo
 
 ; ai control settings
 Int SetAIControl
@@ -159,32 +160,6 @@ int GVORNakadashi = 0x73D4
 string ONights = "ONights.esp"
 int GVONFreqMult = 0x000D65
 int GVONStopWhenFound = 0x000D64
-
-string OBody = "OBody.esp"
-int GVOBorefit = 0x001802
-int GVOBNippleRand = 0x001803
-int GVOBGenitalRand = 0x001804
-int GVOBPrestKey = 0x001805
-
-string OCum = "OCum.esp"
-int SetOCumKey
-string SUOCumKey = "ocum.key"
-int GVOCRegenMod = 0x000822
-int SetOCRegenMod
-int GVOCDisableInflation = 0x000823
-int SetOCDisableInflation
-int GVOCDisableCumshot = 0x000824
-int SetOCDisableCumshot
-int GVOCDisableCumMesh = 0x000837
-int SetOCDisableCumMesh
-int GVOCDisableCumDecal = 0x000838
-int SetOCDisableCumDecal
-
-
-int SetOBRefit
-int SetOBNippleRand
-int SetOBGenitalRand
-int SetOBPresetKey
 
 int SetONStopWhenFound
 int SetONFreqMult
@@ -312,6 +287,7 @@ Event OnPageReset(String Page)
 		SetUseRumble = AddToggleOption("$ostim_use_rumble", Main.UseRumble)
 		SetUseScreenShake = AddToggleOption("$ostim_screenshake", Main.UseScreenShake)
 		SetForceFirstPerson = AddToggleOption("$ostim_force_first", Main.ForceFirstPersonAfter)
+		SetScaling = AddToggleOption("$ostim_scaling", Main.DisableScaling)
 		SetResetPosition = AddToggleOption("$ostim_reset_position", Main.ResetPosAfterSceneEnd) 		
 		AddEmptyOption()
 
@@ -333,9 +309,9 @@ Event OnPageReset(String Page)
 
 		AddColoredHeader("$ostim_header_beds")
 		SetEnableBeds = AddToggleOption("$ostim_use_beds", Main.UseBed)
+		SetConfirmBed = AddToggleOption("$ostim_confirm_bed", Main.ConfirmBed)
 		SetBedSearchDistance = AddSliderOption("$ostim_bed_search_rad", Main.BedSearchDistance, "{0} meters")
 		SetBedReallignment = AddSliderOption("$ostim_bed_reallignment", Main.BedReallignment, "{0} units")
-		SetBedAlgo = AddToggleOption("$ostim_bed_algo", Main.UseAlternateBedSearch)
 		AddEmptyOption()
 
 		AddColoredHeader("$ostim_header_excitement_bars")
@@ -470,15 +446,6 @@ Event OnPageReset(String Page)
 
 		SetCursorPosition(3)
 
-		if main.IsModLoaded(OBody)
-			AddColoredHeader("OBody")
-			SetOBRefit = AddToggleOption("$ostim_addon_ob_refit", GetExternalBool(OBody, GVOBorefit))
-			SetOBNippleRand = AddToggleOption("$ostim_addon_ob_nipples", GetExternalBool(OBody, GVOBNippleRand))
-			SetOBGenitalRand = AddToggleOption("$ostim_addon_ob_genitals", GetExternalBool(OBody, GVOBGenitalRand))
-			SetOBPresetKey = AddKeyMapOption("$ostim_addon_ob_preset_key", GetExternalInt(OBody, GVOBPrestKey))
-			
-		endif 
-
 		if main.IsModLoaded(OCrime)
 			AddColoredHeader("OCrime")
 			SetOCBounty = AddSliderOption("$ostim_addon_oc_bounty", StorageUtil.GetIntValue(none, suocbounty), "{0} Gold")
@@ -491,17 +458,7 @@ Event OnPageReset(String Page)
 			SetOAStatBuffs = AddToggleOption("$ostim_addon_oa_stat_buffs", StorageUtil.GetIntValue(none, SUOAStatBuffs))
 			SetOANudityBroadcast = AddToggleOption("$ostim_addon_oa_nudity_bc", StorageUtil.GetIntValue(none, SUOANudityBroadcast))
 
-		endif 
-
-		if main.IsModLoaded(OCum)
-			AddColoredHeader("OCum")
-			SetOCumKey = AddKeyMapOption("$ostim_addon_ocum_key", StorageUtil.GetIntValue(none, SUOCumKey, 157))
-			SetOCRegenMod = AddSliderOption("$ostim_addon_ocum_RegenMod", GetExternalFloat(ocum, GVOCRegenMod), "{1}")
-			SetOCDisableInflation = AddToggleOption("$ostim_addon_ocum_DisableInflation", GetExternalBool(ocum, GVOCDisableInflation))
-			SetOCDisableCumshot = AddToggleOption("$ostim_addon_ocum_DisableCumshot", GetExternalBool(ocum, GVOCDisableCumshot))
-			SetOCDisableCumMesh = AddToggleOption("$ostim_addon_ocum_DisableCumMesh", GetExternalBool(ocum, GVOCDisableCumMesh))
-			SetOCDisableCumDecal = AddToggleOption("$ostim_addon_ocum_DisableCumDecal", GetExternalBool(ocum, GVOCDisableCumDecal))
-		endIf
+		endif
 
 	ElseIf (Page == "$ostim_page_undress")
 		LoadCustomContent("Ostim/logo.dds", 184, 31)
@@ -592,15 +549,6 @@ Event OnOptionSelect(Int Option)
 		elseif option == SetONStopWhenFound
 			SetExternalBool(ONights, GVONStopWhenFound, !GetExternalBool(ONights, GVONStopWhenFound))
 			SetToggleOptionValue(SetONStopWhenFound, GetExternalBool(ONights, GVONStopWhenFound))
-		elseif option == SetOBRefit
-			SetExternalBool(OBody, GVOBorefit, !GetExternalBool(OBody, GVOBorefit))
-			SetToggleOptionValue(SetOBRefit, GetExternalBool(OBody, GVOBorefit))
-		elseif option == SetOBNippleRand
-			SetExternalBool(OBody, GVOBNippleRand, !GetExternalBool(OBody, GVOBNippleRand))
-			SetToggleOptionValue(SetOBNippleRand, GetExternalBool(OBody, GVOBNippleRand))
-		elseif option == SetOBGenitalRand
-			SetExternalBool(OBody, GVOBGenitalRand, !GetExternalBool(OBody, GVOBGenitalRand))
-			SetToggleOptionValue(SetOBGenitalRand, GetExternalBool(OBody, GVOBGenitalRand))
 		elseif option == SetOSAllowSex
 			StorageUtil.SetIntValue(none, SUOSAllowSex, (!(StorageUtil.GetIntValue(none, SUOSAllowSex) as bool)) as int)
 			SetToggleOptionValue(SetOSAllowSex, StorageUtil.GetIntValue(none, SUOSAllowSex))
@@ -622,18 +570,6 @@ Event OnOptionSelect(Int Option)
 		elseif option == SetOANudityBroadcast
 			StorageUtil.SetIntValue(none, SUOANudityBroadcast, (!(StorageUtil.GetIntValue(none, SUOANudityBroadcast) as bool)) as int)
 			SetToggleOptionValue(SetOANudityBroadcast, StorageUtil.GetIntValue(none, SUOANudityBroadcast))
-		elseif option == SetOCDisableInflation
-			SetExternalBool(ocum, GVOCDisableInflation, !GetExternalBool(ocum, GVOCDisableInflation))
-			SetToggleOptionValue(SetOCDisableInflation, GetExternalBool(ocum, GVOCDisableInflation))
-		elseif option == SetOCDisableCumshot
-			SetExternalBool(ocum, GVOCDisableCumshot, !GetExternalBool(ocum, GVOCDisableCumshot))
-			SetToggleOptionValue(SetOCDisableCumshot, GetExternalBool(ocum, GVOCDisableCumshot))
-		elseif option == SetOCDisableCumMesh
-			SetExternalBool(ocum, GVOCDisableCumMesh, !GetExternalBool(ocum, GVOCDisableCumMesh))
-			SetToggleOptionValue(SetOCDisableCumMesh, GetExternalBool(ocum, GVOCDisableCumMesh))
-		elseif option == SetOCDisableCumDecal
-			SetExternalBool(ocum, GVOCDisableCumDecal, !GetExternalBool(ocum, GVOCDisableCumDecal))
-			SetToggleOptionValue(SetOCDisableCumDecal, GetExternalBool(ocum, GVOCDisableCumDecal))
 		endif
 		return
 	EndIf
@@ -662,9 +598,15 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetEnableBeds)
 		Main.UseBed = !Main.UseBed
 		SetToggleOptionValue(Option, Main.UseBed)
+	ElseIf (Option == SetConfirmBed)
+		Main.ConfirmBed = !Main.ConfirmBed
+		SetToggleOptionValue(Option, Main.ConfirmBed)
 	ElseIf (Option == SetTutorialMessages)
 		Main.ShowTutorials = !Main.ShowTutorials
 		SetToggleOptionValue(Option, Main.ShowTutorials)
+	ElseIf (Option == SetScaling)
+		Main.DisableScaling = !Main.DisableScaling
+		SetToggleOptionValue(Option, Main.DisableScaling)
 	ElseIf (Option == SetUseRumble)
 		Main.UseRumble = !Main.UseRumble
 		SetToggleOptionValue(Option, Main.UseRumble)
@@ -716,9 +658,6 @@ Event OnOptionSelect(Int Option)
 	ElseIf (Option == SetUndressIfneed)
 		Main.AutoUndressIfNeeded = !Main.AutoUndressIfNeeded
 		SetToggleOptionValue(Option, Main.AutoUndressIfNeeded)
-	ElseIf (Option == SetBedAlgo)
-		Main.UseAlternateBedSearch = !Main.UseAlternateBedSearch
-		SetToggleOptionValue(Option, Main.UseAlternateBedSearch)
 	ElseIf (Option == SetClipinglessFirstPerson)
 		Main.EnableImprovedCamSupport = !Main.EnableImprovedCamSupport
 		SetToggleOptionValue(Option, Main.EnableImprovedCamSupport)
@@ -801,8 +740,6 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_oa_key")
 		elseif (option == SetOSKey)
 			SetInfoText("$ostim_tooltip_os_key")
-		elseif (option == SetOBPresetKey)
-			SetInfoText("$ostim_tooltip_ob_preset_key")
 		elseif (option == SetORSexuality)
 			SetInfoText("$ostim_tooltip_or_sexuality")
 		elseif (option == SetORColorblind)
@@ -823,12 +760,6 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_op_freq")
 		Elseif (Option == SetONStopWhenFound)
 			SetInfoText("$ostim_tooltip_on_stop")
-		Elseif (Option == SetOBRefit)
-			SetInfoText("$ostim_tooltip_ob_refit")
-		Elseif (Option == SetOBNippleRand)
-			SetInfoText("$ostim_tooltip_ob_nipple")
-		Elseif (Option == SetOBGenitalRand)
-			SetInfoText("$ostim_tooltip_ob_genitals")
 		Elseif (Option == SetOARequireLowArousalBeforeEnd)
 			SetInfoText("$ostim_tooltip_oa_low_arousal_end")
 		Elseif (Option == SetOSAllowHub)
@@ -843,18 +774,6 @@ Event OnOptionHighlight(Int Option)
 			SetInfoText("$ostim_tooltip_oa_nudity_bc")
 		Elseif (Option == SetOAStatBuffs)
 			SetInfoText("$ostim_tooltip_oa_stat_buffs")
-		ElseIf (Option == SetOCumKey)
-			SetInfoText("$ostim_tooltip_ocum_key")
-		ElseIf (Option == SetOCRegenMod)
-			SetInfoText("$ostim_tooltip_OCRegenMod")
-		ElseIf (Option == SetOCDisableInflation)
-			SetInfoText("$ostim_tooltip_OCDisableInflation")
-		ElseIf (Option == SetOCDisableCumshot)
-			SetInfoText("$ostim_tooltip_OCDisableCumshot")
-		ElseIf (Option == SetOCDisableCumMesh)
-			SetInfoText("$ostim_tooltip_OCDisableCumMesh")
-		ElseIf (Option == SetOCDisableCumDecal)
-			SetInfoText("$ostim_tooltip_OCDisableCumDecal")
 		endif 
 
 		return
@@ -879,6 +798,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_ai_masturbation")
 	ElseIf (Option == SetUseFades)
 		SetInfoText("$ostim_tooltip_fades")
+	ElseIf (Option == SetScaling)
+		SetInfoText("$ostim_tooltip_scaling")
 	ElseIf (Option == SetUseCosaveWorkaround)
 		SetInfoText("$ostim_tooltip_cosave")
 	ElseIf (Option == SetFreeCamFOV)
@@ -909,8 +830,6 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_undress_if_need")
 	ElseIf (Option == SetBedSearchDistance)
 		SetInfoText("$ostim_tooltip_bed_search_dist")
-	ElseIf (Option == SetBedAlgo)
-		SetInfoText("$ostim_tooltip_bed_algo")
 	ElseIf (Option == SetUseAutoFades)
 		SetInfoText("$ostim_tooltip_auto_fades")
 	ElseIf (Option == SetAIChangeChance)
@@ -927,6 +846,8 @@ Event OnOptionHighlight(Int Option)
 		SetInfoText("$ostim_tooltip_sub_bar")
 	ElseIf (Option == SetEnableBeds)
 		SetInfoText("$ostim_tooltip_enable_beds")
+	ElseIf (Option == SetConfirmBed)
+		SetInfoText("$ostim_tooltip_confirm_bed")
 	ElseIf (Option == SetTutorialMessages)
 		SetInfoText("$ostim_tooltip_enable_tutorial")
 	ElseIf (Option == setupdate)
@@ -1111,11 +1032,6 @@ Event OnOptionSliderOpen(Int Option)
 		SetSliderDialogDefaultValue(0)
 		SetSliderDialogRange(-80, 80)
 		SetSliderDialogInterval(1)
-	elseif (option == SetOCRegenMod)
-		GetExternalFloat(ocum, GVOCRegenMod)
-		SetSliderDialogDefaultValue(1)
-		SetSliderDialogRange(0, 2)
-		SetSliderDialogInterval(0.1)
 	EndIf
 EndEvent
 
@@ -1160,9 +1076,6 @@ Event OnOptionSliderAccept(Int Option, Float Value)
 	ElseIf (Option == SetAIChangeChance)
 		Main.AiSwitchChance = (Value as Int)
 		SetSliderOptionValue(Option, Value, "{0}")
-	ElseIf (Option == SetOCRegenMod)
-		SetExternalFloat(ocum, GVOCRegenMod, Value)
-		SetSliderOptionValue(SetOCRegenMod, Value, "{1}")
 	EndIf
 EndEvent
 
@@ -1189,9 +1102,6 @@ Event OnOptionKeyMapChange(Int Option, Int KeyCode, String ConflictControl, Stri
 	Elseif (Option == SetORKey)
 		SetExternalInt(oromance, gvorkey, KeyCode)
 		SetKeyMapOptionValue(Option, KeyCode)
-	Elseif (Option == SetOBPresetKey)
-		SetExternalInt(OBody, GVOBPrestKey, KeyCode)
-		SetKeyMapOptionValue(Option, KeyCode)
 	Elseif (Option == SetORLeft)
 		SetExternalInt(oromance, GVORLeft, KeyCode)
 		SetKeyMapOptionValue(Option, KeyCode)
@@ -1203,9 +1113,6 @@ Event OnOptionKeyMapChange(Int Option, Int KeyCode, String ConflictControl, Stri
 		SetKeyMapOptionValue(Option, KeyCode)
 	Elseif (Option == SetORRight)
 		SetExternalInt(oromance, GVORRight, KeyCode)
-		SetKeyMapOptionValue(Option, KeyCode)
-	ElseIf (Option == SetOCumKey)
-		StorageUtil.SetIntValue(none, SUOcumKey, keycode)
 		SetKeyMapOptionValue(Option, KeyCode)
 	ElseIf (Option == SetOsaMainMenuKey)
 		OSAControl.osaMainMenuKey = keyCode
@@ -1351,6 +1258,7 @@ Function ExportSettings()
 	JMap.SetInt(OstimSettingsFile, "SetEndAfterActorHit", Main.EndAfterActorHit as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUseRumble", Main.UseRumble as Int)
 	JMap.SetInt(OstimSettingsFile, "SetUseScreenShake", Main.UseScreenShake as Int)
+	JMap.SetInt(OstimSettingsFile, "SetScaling", Main.DisableScaling as Int)
 	JMap.SetInt(OstimSettingsFile, "SetOnlyGayAnimsInGayScenes", Main.OnlyGayAnimsInGayScenes as Int)
 
 	; Player roles settings.
@@ -1395,9 +1303,9 @@ Function ExportSettings()
 
 	; Bed settings export.
 	JMap.SetInt(OstimSettingsFile, "SetEnableBeds", Main.UseBed as Int)
+	JMap.SetInt(OstimSettingsFile, "SetConfirmBed", Main.ConfirmBed as Int)
 	JMap.SetInt(OstimSettingsFile, "SetBedSearchDistance", Main.BedSearchDistance as Int)
 	JMap.SetInt(OstimSettingsFile, "SetBedReallignment", Main.BedReallignment as Int)
-	JMap.SetInt(OstimSettingsFile, "SetBedAlgo", Main.UseAlternateBedSearch as Int)
 
 	; Ai/Control settings export.
 	JMap.SetInt(OstimSettingsFile, "SetAIControl", Main.UseAIControl as Int)
@@ -1480,17 +1388,6 @@ Function ExportSettings()
 		JMap.setInt(OstimSettingsFile, "savedoVirginity", 0)
 	endif
 
-	if main.IsModLoaded(OBody)
-		osexintegrationmain.Console("Saving OBody settings.")
-		JMap.setInt(OstimSettingsFile, "savedOBody", 1)
-		JMap.setInt(OstimSettingsFile, "SetOBRefit", GetExternalBool(OBody, GVOBorefit) as Int)
-		JMap.setInt(OstimSettingsFile, "SetOBNippleRand", GetExternalBool(OBody, GVOBNippleRand) as Int)
-		JMap.setInt(OstimSettingsFile, "SetOBGenitalRand", GetExternalBool(OBody, GVOBGenitalRand) as Int)
-		JMap.setInt(OstimSettingsFile, "SetOBPresetKey", GetExternalInt(OBody, GVOBPrestKey) as Int)
-	Else
-		JMap.setInt(OstimSettingsFile, "savedOBody", 0)
-	endif
-
 	if main.IsModLoaded(OCrime)
 		osexintegrationmain.Console("Saving OCrime settings.")
 		JMap.setInt(OstimSettingsFile, "savedOCrime", 1)
@@ -1509,19 +1406,6 @@ Function ExportSettings()
 	Else
 		JMap.setInt(OstimSettingsFile, "savedOAroused", 0)
 	endif
-
-	if main.IsModLoaded(OCum)
-		OUtils.Console("Saving OCum settings.")
-		JMap.SetInt(OStimSettingsFile, "savedOCum", 1)
-		JMap.SetInt(OStimSettingsFile, "SetOCumKey", StorageUtil.GetIntValue(none, SUOCumKey))
-		JMap.SetFlt(OStimSettingsFile, "SetOCRegenMod", GetExternalFloat(ocum, GVOCRegenMod))
-		JMap.SetInt(OStimSettingsFile, "SetOCDisableInflation", GetExternalBool(ocum, GVOCDisableInflation) as int)
-		JMap.SetInt(OStimSettingsFile, "SetOCDisableCumshot", GetExternalBool(ocum, GVOCDisableCumshot) as int)
-		JMap.SetInt(OStimSettingsFile, "SetOCDisableCumMesh", GetExternalBool(ocum, GVOCDisableCumMesh) as int)
-		JMap.SetInt(OStimSettingsFile, "SetOCDisableCumDecal", GetExternalBool(ocum, GVOCDisableCumDecal) as int)
-	else
-		JMap.SetInt(OStimSettingsFile, "savedOCum", 0)
-	endIf
 
 	; Save to file.
 	JMap.SetInt(OstimSettingsFile, "OStimAPIVersion", outils.getostim().getapiversion())
@@ -1581,6 +1465,7 @@ Function ImportSettings(bool default = false)
 	Main.EndAfterActorHit = JMap.GetInt(OstimSettingsFile, "SetEndAfterActorHit")
 	Main.UseRumble = JMap.GetInt(OstimSettingsFile, "SetUseRumble")
 	Main.UseScreenShake = JMap.GetInt(OstimSettingsFile, "SetUseScreenShake")
+	Main.DisableScaling = JMap.GetInt(OstimSettingsFile, "SetScaling")
 	Main.OnlyGayAnimsInGayScenes = JMap.GetInt(OstimSettingsFile, "SetOnlyGayAnimsInGayScenes")
 
 	;Player Roles settings
@@ -1637,9 +1522,9 @@ Function ImportSettings(bool default = false)
 
 	; Bed settings export.
 	Main.UseBed = JMap.GetInt(OstimSettingsFile, "SetEnableBeds")
+	Main.ConfirmBed = JMap.GetInt(OstimSettingsFile, "SetConfirmBed")
 	Main.BedSearchDistance = JMap.GetInt(OstimSettingsFile, "SetBedSearchDistance")
 	Main.BedReallignment = JMap.GetInt(OstimSettingsFile, "SetBedReallignment")
-	Main.UseAlternateBedSearch = JMap.GetInt(OstimSettingsFile, "SetBedAlgo")
 	Main.AiSwitchChance = JMap.GetInt(OstimSettingsFile, "SetAIChangeChance")
 	
 	;Orgasm settings
@@ -1705,14 +1590,6 @@ Function ImportSettings(bool default = false)
 			StorageUtil.SetIntValue(none, SUOVVirginChance, JMap.GetInt(OstimSettingsFile, "SetOVVirginChance"))
 		endif
 
-		if main.IsModLoaded(OBody) && JMap.getInt(OstimSettingsFile, "savedOBody") == 1
-			osexintegrationmain.Console("Loading OBody settings.")
-			SetExternalBool(OBody, GVOBorefit, JMap.getInt(OstimSettingsFile, "SetOBRefit") as bool)
-			SetExternalBool(OBody, GVOBNippleRand, JMap.getInt(OstimSettingsFile, "SetOBNippleRand") as bool)
-			SetExternalBool(OBody, GVOBGenitalRand, JMap.getInt(OstimSettingsFile, "SetOBGenitalRand") as bool)
-			SetExternalInt(OBody, GVOBPrestKey, JMap.getInt(OstimSettingsFile, "SetOBPresetKey"))
-		endif
-
 		if main.IsModLoaded(OCrime) && JMap.getInt(OstimSettingsFile, "savedOCrime") == 1
 			osexintegrationmain.Console("Loading OCrime settings.")
 			StorageUtil.SetIntValue(none, suocbounty, JMap.getInt(OstimSettingsFile, "SetOCBounty"))
@@ -1725,16 +1602,6 @@ Function ImportSettings(bool default = false)
 			StorageUtil.SetIntValue(none, SUOAStatBuffs, JMap.getInt(OstimSettingsFile, "SetOAStatBuffs"))
 			StorageUtil.SetIntValue(none, SUOANudityBroadcast, JMap.getInt(OstimSettingsFile, "SetOANudityBroadcast"))
 		endif
-
-		if main.IsModLoaded(OCum) && JMap.GetInt(OStimSettingsFile, "savedOCum") == 1
-			OUtils.Console("Loading OAroused settings.")
-			StorageUtil.SetIntValue(none, SUOCumKey, JMap.GetInt(OStimSettingsFile, "SetOCumKey"))
-			SetExternalFloat(OCum, GVOCRegenMod, JMap.GetFlt(OStimSettingsFile, "SetOCRegenMod"))
-			SetExternalBool(OCum, GVOCDisableInflation, JMap.GetInt(OStimSettingsFile, "SetOCDisableInflation") as bool)
-			SetExternalBool(OCum, GVOCDisableCumshot, JMap.GetInt(OStimSettingsFile, "SetOCDisableCumshot") as bool)
-			SetExternalBool(OCum, GVOCDisableCumMesh, JMap.GetInt(OStimSettingsFile, "SetOCDisableCumMesh") as bool)
-			SetExternalBool(OCum, GVOCDisableCumDecal, JMap.GetInt(OStimSettingsFile, "SetOCDisableCumDecal") as bool)
-		endIf
 	endif
 
 	osexintegrationmain.Console("Loading Ostim settings.")
