@@ -1207,7 +1207,8 @@ Function EndAnimation(Bool SmoothEnding = True)
 		;console("game loaded")
 		SendModEvent("0SA_GameLoaded")
 	else 
-		UI.Invoke("HUD Menu", diasa + ".endCommand")
+		ResetState()
+		;UI.Invoke("HUD Menu", diasa + ".endCommand")
 		;UI.InvokeInt("HUD Menu", o + ".com.endCommand", password)
 		;RunOsexCommand("$endscene")
 	endif 
